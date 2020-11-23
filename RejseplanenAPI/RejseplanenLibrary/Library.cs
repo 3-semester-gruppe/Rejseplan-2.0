@@ -11,6 +11,8 @@ namespace RejseplanenLibrary
         private double _hastighed;
         private string _brugernavn;
 
+        public static int Counter = 1;
+
         [Key]
         public int Id
         {
@@ -63,12 +65,12 @@ namespace RejseplanenLibrary
 
         public Library()
         {
-            
+            Id = Counter++;
         }
 
-        public Library(int id, double hastighed, string brugernavn, DateTime timeStamp)
+        public Library(double hastighed, string brugernavn, DateTime timeStamp)
         {
-            Id = id;
+            Id = Counter++;
             Hastighed = hastighed;
             Brugernavn = brugernavn;
             TimeStamp = timeStamp;

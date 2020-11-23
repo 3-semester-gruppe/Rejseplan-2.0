@@ -12,19 +12,16 @@ namespace LibraryUnitTest
         [TestInitialize]
         public void BeforeTest()
         {
-            _library = new Library
-            {
-                Id = 10,
-                Hastighed = 50,
-                Brugernavn = "Test",
-                TimeStamp = new DateTime(2020, 11, 23)
-            };
+            _library = new Library(
+                50,
+                "Test",
+                new DateTime(2020, 11, 23)
+            );
         }
 
         [TestMethod]
         public void IdValueTest()
         {
-            _library.Id = 1;
             Assert.AreEqual(1, _library.Id);
 
             try

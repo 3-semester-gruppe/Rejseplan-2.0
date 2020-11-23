@@ -14,13 +14,13 @@ namespace RejseplanenConsumer
 
         public static void Start()
         {
-            bool result = PostAsync(new Library(1, 10, "Test", new DateTime(2020, 11, 23))).Result;
+            bool result = PostAsync(new Library(10, "Test", new DateTime(2020, 11, 23))).Result;
             Console.WriteLine(result ? "POST succeded" : "POST failed!");
 
-            result = PostAsync(new Library(2, 20, "Test2", new DateTime(2020, 11, 24))).Result;
+            result = PostAsync(new Library(20, "Test2", new DateTime(2020, 11, 24))).Result;
             Console.WriteLine(result ? "POST succeded" : "POST failed!");
 
-            result = PostAsync(new Library(3, 62, "Test3", new DateTime(2020, 11, 25))).Result;
+            result = PostAsync(new Library(62, "Test3", new DateTime(2020, 11, 25))).Result;
             Console.WriteLine(result ? "POST succeded" : "POST failed!");
 
             Console.WriteLine(string.Join("\n", GetAllAsync().Result));
