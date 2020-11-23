@@ -12,8 +12,10 @@ namespace UdpReceiver
 {
     class Receiver
     {
+        //Port nr der lyttes på
         private const int Port = 7000;
 
+        //Methode 
         public static void Start()
         {
             using (UdpClient udpClient = new UdpClient(new IPEndPoint(IPAddress.Any, Port)))
