@@ -7,6 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RejseplanenAPI", "Rejseplan
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RejseplanenLibrary", "RejseplanenLibrary\RejseplanenLibrary.csproj", "{7B7521DF-2265-4D4F-AB41-668DF3724880}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryUnitTest", "LibraryUnitTest\LibraryUnitTest.csproj", "{1056D984-2823-486A-AD6F-F2307440171E}"
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RejseplanenConsumer", "RejseplanenConsumer\RejseplanenConsumer.csproj", "{77418CD8-8BB5-4E2B-9BA0-22D3EDA73AC5}"
 EndProject
 Global
@@ -27,6 +28,10 @@ Global
 		{77418CD8-8BB5-4E2B-9BA0-22D3EDA73AC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77418CD8-8BB5-4E2B-9BA0-22D3EDA73AC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77418CD8-8BB5-4E2B-9BA0-22D3EDA73AC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1056D984-2823-486A-AD6F-F2307440171E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1056D984-2823-486A-AD6F-F2307440171E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1056D984-2823-486A-AD6F-F2307440171E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1056D984-2823-486A-AD6F-F2307440171E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
