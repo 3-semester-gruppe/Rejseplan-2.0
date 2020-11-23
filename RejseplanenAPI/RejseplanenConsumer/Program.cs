@@ -6,7 +6,7 @@ namespace RejseplanenConsumer
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Consumer.Start();
         }
     }
 }
