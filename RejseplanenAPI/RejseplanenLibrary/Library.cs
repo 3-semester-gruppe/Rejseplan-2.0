@@ -73,5 +73,10 @@ namespace RejseplanenLibrary
             Brugernavn = brugernavn;
             TimeStamp = timeStamp;
         }
+
+        public override string ToString()
+        {
+            return $"Id: {Id}, Hastighed: {Hastighed}, Brugernavn: {Brugernavn}, TimeStamp: {TimeStamp}";
+        }
     }
 }
