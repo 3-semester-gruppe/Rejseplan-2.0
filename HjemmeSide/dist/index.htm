@@ -2,31 +2,38 @@
 <html lang="en-US">
 
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" href="bundle.css">  
-  <title>Hunde Hvalpe</title>
-  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rejseplan 2.0</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/cerulean/bootstrap.min.css">
+    <link rel="stylesheet" href="bundle.css">
 </head>
 
 <body>
-  <h1>This is a website for showing puppies</h1>
-  <div id="app">
-    <select v-model="methodType" id="methodDropDown" required>
-      <option value="normal">Normal mode</option>
-      <option value="frejaMode">Freja mode</option>
-      <option value="frejaMode2">Freja mode 2</option>
-    </select>
-    <div id="itemDiv">
-      <button v-on:click="show()" class="btn btn-primary">{{ sayHello }}</button>
-    </div>
-    <div id="mainwrapper" class="container">
-      <div class="item" v-for="dog of dogs">
-        <img :src='dog.Img' alt="This is a picture of a dog"> 
+  <div id="app" class="container">
+    <div class="jumbotron">
+      <div id="Search">
+        <h1>
+          <input v-model="search" placeholder="Search">
+        </h1>
+        <button v-on:click="getSearchedItems()" class="btn btn-primary">Search</button>
       </div>
+      <library v-for="library in librarys" v-bind:key="library.id" v-bind:library="library"></library>
+      
+      <!-- <div :style="styleObject">
+        <p v-if="fan.humidity > 40">Det anbefalede fugtniveau er for højt</p>
+        <p v-if="fan.humidity < 10">Det anbefalede fugtniveau er for lavt</p>
+      </div> -->
     </div>
   </div>
-
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   <script src="bundle.js"></script>
 </body>
-
 </html>

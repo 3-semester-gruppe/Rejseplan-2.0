@@ -22,7 +22,7 @@
         </h1>
         <button v-on:click="getSearchedItems()" class="btn btn-primary">Search</button>
       </div>
-      <record v-for="record in records" v-bind:key="record.title" v-bind:record="record"></record>
+      <library v-for="library in librarys" v-bind:key="library.id" v-bind:library="library"></library>
       
       <!-- <div :style="styleObject">
         <p v-if="fan.humidity > 40">Det anbefalede fugtniveau er for højt</p>

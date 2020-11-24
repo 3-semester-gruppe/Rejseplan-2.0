@@ -6,41 +6,36 @@ axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencod
 axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 
 
-interface IRecord {
-    "title": string,
-    "artist": string,
-    "duration": number,
-    "yearOfPublication": number,
-    "numberOfTracks": number
+interface ILibrary {
+    "brugernavn": string,
+    "hastighed": number,
+    "timestamp": Date,
+    "id": number
 }
-Vue.component('record', {
-    props: ['record'],
+Vue.component('library', {
+    props: ['library'],
     methods: {
     },
     template: `
-        <div class="jumbotron record">
-            <h1>{{ record.title }}</h1>
-            <div class="artist-row">
-                <h2 class="record-stat">Artist:</h2>
-                <h2 class="record-info">{{ record.artist }}</h2>
+        <div class="jumbotron library">
+            <h1>{{ library.brugernavn }}</h1>
+            <div class="hastighed-row">
+                <h2 class="library-stat">Hastighed:</h2>
+                <h2 class="library-info">{{ library.hastighed }}</h2>
             </div>
-            <div class="artist-row">
-                <h2 class="record-stat">Duration:</h2>
-                <h2 class="record-info">{{ Math.ceil(record.duration / 60) }} min</h2>
+            <div class="hastighed-row">
+                <h2 class="library-stat">TimeStamp:</h2>
+                <h2 class="library-info">{{ library.timestamp }}</h2>
             </div>
-            <div class="artist-row">
-                <h2 class="record-stat">Year of publication:</h2>
-                <h2 class="record-info">{{ record.yearOfPublication }}</h2>
-            </div>
-            <div class="artist-row">
-                <h2 class="record-stat">Number of tracks:</h2>
-                <h2 class="record-info">{{ record.numberOfTracks }}</h2>
+            <div class="hastighed-row">
+                <h2 class="library-stat">Year of publication:</h2>
+                <h2 class="library-info">{{ library.id }}</h2>
             </div>
         </div>
     `
 })
 
-let baseUrl = 'https://restapidr.azurewebsites.net/record';
+let baseUrl = 'http://localhost:49606/api/Libraries';
 
 new Vue({
     // TypeScript compiler complains about Vue because the CDN link to Vue is in the html file.
@@ -48,7 +43,7 @@ new Vue({
     // which is included at the bottom of the html file.
     el: "#app",
     data: {
-        records: [],
+        librarys: [],
         styleObject: {
             background: 'red',
             color: 'white',
@@ -57,11 +52,11 @@ new Vue({
         search: ""
     },
     methods: {
-        async getRecordAsync(){
+        async getLibraryAsync(){
             try {
-                axios.get<IRecord[]>(baseUrl, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } )
-                .then(result => {this.records = result.data;})
-                .catch(error => {return error});
+                axios.get<ILibrary[]>(baseUrl, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } )
+                .then(result => {this.librarys = result.data;})
+                .catch(error => {return []});
 
             }
             catch ( error: AxiosError){
@@ -77,19 +72,19 @@ new Vue({
                 this.getSearch(searchVar);
             }
             else{
-                this.records = []
-                this.getAllSearch("artist=" + this.search);
-                this.getAllSearch("title=" + this.search);
+                this.librarys = []
+                this.getAllSearch("hastighed=" + this.search);
+                this.getAllSearch("brugernavn=" + this.search);
                 if(isNaN(this.search) == false){
                     this.getAllSearch("yearofpublication=" + this.search);
                 }
             }
         },
         async getSearch(searchString : string){
-            let returnData : IRecord[] = [];
+            let returnData : ILibrary[] = [];
             try {
-                axios.get<IRecord[]>(baseUrl + "/search?" + searchString, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } )
-                .then(result => {this.records = result.data;})
+                axios.get<ILibrary[]>(baseUrl + "/search?" + searchString, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } )
+                .then(result => {this.librarys = result.data;})
                 .catch(error => {return []});
 
             }
@@ -99,20 +94,20 @@ new Vue({
             }
         },
         async getAllSearch(searchString : string){
-            let returnData : IRecord[] = [];
+            let returnData : ILibrary[] = [];
             try {
-                axios.get<IRecord[]>(baseUrl + "/search?" + searchString, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } )
+                axios.get<ILibrary[]>(baseUrl + "/search?" + searchString, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } )
                 .then(result => {
                 for (let dataIndex = 0; dataIndex < result.data.length; dataIndex++) {
                     let exist : boolean = false;
-                    for (let recordsIndex = 0; recordsIndex < this.records.length; recordsIndex++) {
-                        if (result.data[dataIndex].title == this.records[recordsIndex].title){
+                    for (let librarysIndex = 0; librarysIndex < this.librarys.length; librarysIndex++) {
+                        if (result.data[dataIndex].brugernavn == this.librarys[librarysIndex].brugernavn){
                             exist = true;
                             break;
                         }
                     }
                     if(exist == false){
-                        this.records.push(result.data[dataIndex]);
+                        this.librarys.push(result.data[dataIndex]);
                     }
                 }})
                 .catch(error => {return []});
@@ -125,8 +120,8 @@ new Vue({
         }
     },
     created() {
-        this.getRecordAsync();
-        // this.interval = setInterval(() => this.getRecordAsync(), 10000);
+        this.getLibraryAsync();
+        // this.interval = setInterval(() => this.getLibraryAsync(), 10000);
     }
 })
 

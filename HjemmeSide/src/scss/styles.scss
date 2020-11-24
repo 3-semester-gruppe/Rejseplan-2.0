@@ -2,7 +2,7 @@ p{
     align-self: center;
     align-content: center;
 }
-.record{
+.library{
     padding: 6%;
     display: grid;
     grid-template-columns: auto;
@@ -10,18 +10,18 @@ p{
     background-color: rgba(0, 17, 255, 0.096)
 }
 
-.artist-row{
+.hastighed-row{
     display: grid;
     grid-template-columns: 40% auto auto;
     grid-template-areas:
     "stat . info"
 }
 
-.record-stat{
+.library-stat{
     grid-area: stat;
 }
 
-.record-info{
+.library-info{
     grid-area: info;
     text-align: left;
 }
