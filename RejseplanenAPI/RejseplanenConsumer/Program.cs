@@ -6,7 +6,7 @@ namespace RejseplanenConsumer
     {
         static void Main(string[] args)
         {
-            Consumer.Start();
+            IntegrationTest.Start();
         }
     }
 }
