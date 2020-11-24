@@ -12,6 +12,7 @@ namespace RejseplanenConsumer
     {
         private const string Uri = "http://localhost:49606/api/Libraries";
 
+        //Laver et kald til API'en, som henter alle sensor readings
         public static async Task<IList<Library>> GetAllAsync()
         {
             using (HttpClient client = new HttpClient())
@@ -22,6 +23,7 @@ namespace RejseplanenConsumer
             }
         }
 
+        //Laver et kald til API'en, som henter en sensor reading med et specifikt ID
         public static async Task<Library> GetByIdAsync(int id)
         {
             using (HttpClient client = new HttpClient())
@@ -32,6 +34,7 @@ namespace RejseplanenConsumer
             }
         }
 
+        //Laver et kald til API'en, som tilføjer en sensor reading
         public static async Task<bool> PostAsync(Library value)
         {
             using (HttpClient client = new HttpClient())
@@ -42,6 +45,7 @@ namespace RejseplanenConsumer
             }
         }
 
+        //Laver et kald til API'en, som sletter en specifik sensor reading
         public static async Task<bool> DeleteAsync(int id)
         {
             using (HttpClient client = new HttpClient())
