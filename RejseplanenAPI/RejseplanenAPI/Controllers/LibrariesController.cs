@@ -42,6 +42,21 @@ namespace RejseplanenAPI.Controllers
             return library;
         }
 
+        // GET: api/Libraries/Brugernavn/{substring}
+        [HttpGet]
+        [Route("Brugernavn/{substring}")]
+        public async Task<ActionResult<IEnumerable<Library>>> GetBySubstring(string substring)
+        {
+            var library = await _context.Rejseplanen.ToListAsync();
+
+            if (library.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return library.FindAll(i => i.Brugernavn.ToLower() == substring.ToLower());
+        }
+
         // POST: api/Libraries
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
