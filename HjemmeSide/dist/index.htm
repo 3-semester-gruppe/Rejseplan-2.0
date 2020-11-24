@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en-US">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" href="bundle.css">  
+  <title>Hunde Hvalpe</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+  <h1>This is a website for showing puppies</h1>
+  <div id="app">
+    <select v-model="methodType" id="methodDropDown" required>
+      <option value="normal">Normal mode</option>
+      <option value="frejaMode">Freja mode</option>
+      <option value="frejaMode2">Freja mode 2</option>
+    </select>
+    <div id="itemDiv">
+      <button v-on:click="show()" class="btn btn-primary">{{ sayHello }}</button>
+    </div>
+    <div id="mainwrapper" class="container">
+      <div class="item" v-for="dog of dogs">
+        <img :src='dog.Img' alt="This is a picture of a dog"> 
+      </div>
+    </div>
+  </div>
+
+  <script src="bundle.js"></script>
+</body>
+
+</html>
