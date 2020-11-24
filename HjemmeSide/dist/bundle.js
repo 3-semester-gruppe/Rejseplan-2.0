@@ -2137,51 +2137,31 @@ module.exports = __webpack_require__.p + "index.htm";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../node_modules/axios/index */ "./node_modules/axios/index.js");
 /* harmony import */ var _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_axios_index__WEBPACK_IMPORTED_MODULE_0__);
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 
 _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_0___default.a.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded';
 _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_0___default.a.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 Vue.component('library', {
     props: ['library'],
     methods: {},
-    template: "\n        <div class=\"jumbotron library\">\n            <h1>{{ library.brugernavn }}</h1>\n            <div class=\"hastighed-row\">\n                <h2 class=\"library-stat\">Hastighed:</h2>\n                <h2 class=\"library-info\">{{ library.hastighed }}</h2>\n            </div>\n            <div class=\"hastighed-row\">\n                <h2 class=\"library-stat\">TimeStamp:</h2>\n                <h2 class=\"library-info\">{{ library.timestamp }}</h2>\n            </div>\n            <div class=\"hastighed-row\">\n                <h2 class=\"library-stat\">Year of publication:</h2>\n                <h2 class=\"library-info\">{{ library.id }}</h2>\n            </div>\n        </div>\n    "
+    template: `
+        <div class="jumbotron library">
+            <h1>{{ library.brugernavn }}</h1>
+            <div class="hastighed-row">
+                <h2 class="library-stat">Hastighed:</h2>
+                <h2 class="library-info">{{ library.hastighed }}</h2>
+            </div>
+            <div class="hastighed-row">
+                <h2 class="library-stat">TimeStamp:</h2>
+                <h2 class="library-info">{{ library.timestamp }}</h2>
+            </div>
+            <div class="hastighed-row">
+                <h2 class="library-stat">Year of publication:</h2>
+                <h2 class="library-info">{{ library.id }}</h2>
+            </div>
+        </div>
+    `
 });
-var baseUrl = 'http://localhost:49606/api/Libraries';
+let baseUrl = 'http://localhost:49606/api/Libraries';
 new Vue({
     // TypeScript compiler complains about Vue because the CDN link to Vue is in the html file.
     // Before the application runs this TypeScript file will be compiled into bundle.js
@@ -2197,98 +2177,28 @@ new Vue({
         search: ""
     },
     methods: {
-        getLibraryAsync: function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var _this = this;
-                return __generator(this, function (_a) {
-                    try {
-                        _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_0___default.a.get(baseUrl, { headers: { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS", "Access-Control-Allow-Credentials": "true" } })
-                            .then(function (result) { _this.librarys = result.data; })
-                            .catch(function (error) { return []; });
-                    }
-                    catch (error) {
-                        this.message = error.message;
-                        alert(error.message);
-                    }
-                    return [2 /*return*/];
-                });
-            });
+        async getLibraryAsync() {
+            try {
+                _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_0___default.a.get(baseUrl + "/brugernavn/" + this.search, { headers: { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS", "Access-Control-Allow-Credentials": "true" } }).then().catch(error => this.librarys = [])
+                    .then(result => { this.librarys = result.data; })
+                    .catch(error => { return []; });
+            }
+            catch (error) {
+                this.message = error.message;
+                alert(error.message);
+            }
         },
-        getSearchedItems: function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var searchVar;
-                return __generator(this, function (_a) {
-                    if (this.search.includes("=")) {
-                        searchVar = this.search;
-                        searchVar = searchVar.replace(" ", "&");
-                        this.getSearch(searchVar);
-                    }
-                    else {
-                        this.librarys = [];
-                        this.getAllSearch("hastighed=" + this.search);
-                        this.getAllSearch("brugernavn=" + this.search);
-                        if (isNaN(this.search) == false) {
-                            this.getAllSearch("yearofpublication=" + this.search);
-                        }
-                    }
-                    return [2 /*return*/];
-                });
-            });
-        },
-        getSearch: function (searchString) {
-            return __awaiter(this, void 0, void 0, function () {
-                var returnData;
-                var _this = this;
-                return __generator(this, function (_a) {
-                    returnData = [];
-                    try {
-                        _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_0___default.a.get(baseUrl + "/search?" + searchString, { headers: { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS", "Access-Control-Allow-Credentials": "true" } })
-                            .then(function (result) { _this.librarys = result.data; })
-                            .catch(function (error) { return []; });
-                    }
-                    catch (error) {
-                        this.message = error.message;
-                        alert(error.message);
-                    }
-                    return [2 /*return*/];
-                });
-            });
-        },
-        getAllSearch: function (searchString) {
-            return __awaiter(this, void 0, void 0, function () {
-                var returnData;
-                var _this = this;
-                return __generator(this, function (_a) {
-                    returnData = [];
-                    try {
-                        _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_0___default.a.get(baseUrl + "/search?" + searchString, { headers: { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS", "Access-Control-Allow-Credentials": "true" } })
-                            .then(function (result) {
-                            for (var dataIndex = 0; dataIndex < result.data.length; dataIndex++) {
-                                var exist = false;
-                                for (var librarysIndex = 0; librarysIndex < _this.librarys.length; librarysIndex++) {
-                                    if (result.data[dataIndex].brugernavn == _this.librarys[librarysIndex].brugernavn) {
-                                        exist = true;
-                                        break;
-                                    }
-                                }
-                                if (exist == false) {
-                                    _this.librarys.push(result.data[dataIndex]);
-                                }
-                            }
-                        })
-                            .catch(function (error) { return []; });
-                    }
-                    catch (error) {
-                        this.message = error.message;
-                        alert(error.message);
-                    }
-                    return [2 /*return*/];
-                });
-            });
+        async deleteLibraryAsync() {
+            try {
+                _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_0___default.a.delete(baseUrl + "/brugernavn/" + this.search, { headers: { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS", "Access-Control-Allow-Credentials": "true" } }).then(error => this.librarys = []).catch(error => this.librarys = []);
+            }
+            catch (error) {
+                this.message = error.message;
+                alert(error.message);
+            }
         }
     },
-    created: function () {
-        this.getLibraryAsync();
+    created() {
         // this.interval = setInterval(() => this.getLibraryAsync(), 10000);
     }
 });

@@ -20,7 +20,8 @@
         <h1>
           <input v-model="search" placeholder="Search">
         </h1>
-        <button v-on:click="getSearchedItems()" class="btn btn-primary">Search</button>
+        <button v-on:click="getLibraryAsync()" class="btn btn-primary">Search</button>
+        <button v-on:click="deleteLibraryAsync()" class="btn btn-primary">Done</button>
       </div>
       <library v-for="library in librarys" v-bind:key="library.id" v-bind:library="library"></library>
       

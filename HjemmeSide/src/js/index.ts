@@ -54,7 +54,7 @@ new Vue({
     methods: {
         async getLibraryAsync(){
             try {
-                axios.get<ILibrary[]>(baseUrl, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } )
+                axios.get<ILibrary[]>(baseUrl + "/brugernavn/" + this.search, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } ).then().catch(error => this.librarys = [])
                 .then(result => {this.librarys = result.data;})
                 .catch(error => {return []});
 
@@ -64,54 +64,9 @@ new Vue({
                 alert(error.message);
             }
         },
-        async getSearchedItems(){
-            let searchVar : string;
-            if(this.search.includes("=")){
-                searchVar = this.search;
-                searchVar = searchVar.replace(" ","&");
-                this.getSearch(searchVar);
-            }
-            else{
-                this.librarys = []
-                this.getAllSearch("hastighed=" + this.search);
-                this.getAllSearch("brugernavn=" + this.search);
-                if(isNaN(this.search) == false){
-                    this.getAllSearch("yearofpublication=" + this.search);
-                }
-            }
-        },
-        async getSearch(searchString : string){
-            let returnData : ILibrary[] = [];
+        async deleteLibraryAsync(){
             try {
-                axios.get<ILibrary[]>(baseUrl + "/search?" + searchString, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } )
-                .then(result => {this.librarys = result.data;})
-                .catch(error => {return []});
-
-            }
-            catch ( error: AxiosError){
-                this.message = error.message;
-                alert(error.message);
-            }
-        },
-        async getAllSearch(searchString : string){
-            let returnData : ILibrary[] = [];
-            try {
-                axios.get<ILibrary[]>(baseUrl + "/search?" + searchString, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } )
-                .then(result => {
-                for (let dataIndex = 0; dataIndex < result.data.length; dataIndex++) {
-                    let exist : boolean = false;
-                    for (let librarysIndex = 0; librarysIndex < this.librarys.length; librarysIndex++) {
-                        if (result.data[dataIndex].brugernavn == this.librarys[librarysIndex].brugernavn){
-                            exist = true;
-                            break;
-                        }
-                    }
-                    if(exist == false){
-                        this.librarys.push(result.data[dataIndex]);
-                    }
-                }})
-                .catch(error => {return []});
-
+                axios.delete(baseUrl + "/brugernavn/" + this.search, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } ).then(error => this.librarys = []).catch(error => this.librarys = [])
             }
             catch ( error: AxiosError){
                 this.message = error.message;
@@ -120,7 +75,6 @@ new Vue({
         }
     },
     created() {
-        this.getLibraryAsync();
         // this.interval = setInterval(() => this.getLibraryAsync(), 10000);
     }
 })
