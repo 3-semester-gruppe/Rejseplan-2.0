@@ -1,0 +1,27 @@
+p {
+  align-self: center;
+  align-content: center; }
+
+.library {
+  padding: 6%;
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: auto auto auto auto auto;
+  background-color: rgba(0, 17, 255, 0.096); }
+
+.hastighed-row {
+  display: grid;
+  grid-template-columns: 40% auto auto;
+  grid-template-areas: "stat . info"; }
+
+.library-stat {
+  grid-area: stat; }
+
+.library-info {
+  grid-area: info;
+  text-align: left; }
+
+#Search {
+  display: grid;
+  grid-template-columns: auto auto;
+  padding: 5%; }
