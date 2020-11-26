@@ -12,7 +12,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "api/Libraries",
+      "launchUrl": "api/help",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -20,7 +20,7 @@
     "RejseplanenAPI": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "api/Libraries",
+      "launchUrl": "api/help",
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
