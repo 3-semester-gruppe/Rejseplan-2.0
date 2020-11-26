@@ -3,27 +3,14 @@
 
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" href="bundle.css">  
-  <title>Hunde Hvalpe</title>
-  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+  <link rel="stylesheet" href="bundle.css">
+  <title>Rejseplanen API</title>
 </head>
 
 <body>
-  <h1>This is a website for showing puppies</h1>
+  <h1>This webpage uses rejseplanen's API</h1>
   <div id="app">
-    <select v-model="methodType" id="methodDropDown" required>
-      <option value="normal">Normal mode</option>
-      <option value="frejaMode">Freja mode</option>
-      <option value="frejaMode2">Freja mode 2</option>
-    </select>
-    <div id="itemDiv">
-      <button v-on:click="show()" class="btn btn-primary">{{ sayHello }}</button>
-    </div>
-    <div id="mainwrapper" class="container">
-      <div class="item" v-for="dog of dogs">
-        <img :src='dog.Img' alt="This is a picture of a dog"> 
-      </div>
-    </div>
   </div>
 
   <script src="bundle.js"></script>

@@ -1,65 +1,50 @@
-new Vue({
-    // TypeScript compiler complains about Vue because the CDN link to Vue is in the html file.
-    // Before the application runs this TypeScript file will be compiled into bundle.js
-    // which is included at the bottom of the html file.
-    el: "#app",
-    data: {
-        dogs: [],
-        methodType: "",
-        showing: false,
-        sayHello: "Say hello"
-    },
-    methods: {
-        show() {
-            if(this.methodType == "frejaMode"){
-                this.showing = false
-                if(this.dogs.length == generateDogs().length){
-                    this.dogs = []
-                }
-                this.dogs.push(generateDog(this.dogs))
-            }
-            else if(this.methodType == "frejaMode2"){
-                this.showing = false
-                this.dogs = []
-                this.dogs.push(generateDog(this.dogs))
-            }
-            else if (!this.showing) {
-                // generateDogs().forEach(element => {
-                //     this.dogs.push({id: element.Id, img: element.Img})
-                // })
-                this.dogs = generateDogs()
-                this.showing = true
-                this.sayHello = "Say bye" //Maybe make whole text and show/hide
-            }
-            else{
-                this.dogs = []
-                this.showing = false
-                this.sayHello = "Say hello"
-            }
-        }
+import Axios from "axios";
+import coord from "proj4";
+
+
+let baseurl: string = "http://xmlopen.rejseplanen.dk/bin/rest.exe";
+let format: string = "&format=json";
+
+var dms = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
+var utm = "+proj=utm +zone=32N +etrs=1989";
+var wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
+
+let locationArray: Array<Location> = []
+
+class Location{
+    name: string;
+    coord: Array<number>
+    distance: number;
+
+    constructor(Name: string, Coord: Array<number>, Distance: number){
+      this.name = Name;
+      this.coord = Coord
+      this.distance = Distance;
     }
-});
-import Dog from "./dog";
-function generateDogs() : Dog[] {
-    let dogArray : Dog[];
-    dogArray = [];
-    for (var _i = 0; _i < 81; _i++){
-        dogArray.push(new Dog(_i,('/HundePictures/' + (_i+1).toString() + '.jpg')))
-    }
-    return dogArray; 
 }
-function generateDog(dogs : Dog[]){
-    let allDogs = generateDogs()
-    dogs.forEach(element => {
-        allDogs = allDogs.filter(item => item !=element);
+
+async function getNearbyStops(x:number, y:number): Promise<void>{
+  let path: string = baseurl + `/stopsNearby?coordX=${x}&coordY=${y}${format}`
+  await Axios
+  .get(path)
+  .then(response=> {
+    let newLocation: Location;
+    response.data.LocationList.StopLocation.forEach((location:any) => {
+      newLocation = new Location(location.name, fromWgsToDms(Number(location.y / 1000000), Number(location.x / 1000000)), location.distance);
+      locationArray.push(newLocation)
     });
-    if(allDogs.length != 0)
-    {
-        return allDogs[getRandomInt(allDogs.length)]
-    }
-    return new Dog(-1,"");
-    
+  })
+  console.log(locationArray)
 }
-function getRandomInt(max : number) {
-    return Math.floor(Math.random() * Math.floor(max));
+
+function fromDmsToWgs(x:number, y:number): Array<number>{
+  let convertedNum = coord(dms, wgs84, [x,y]);
+  return convertedNum
 }
+
+function fromWgsToDms(x:number, y:number): Array<number>{
+  let convertedNum = coord(wgs84, dms, [x,y]);
+  return convertedNum
+}
+
+getNearbyStops(55673059,12565557)
