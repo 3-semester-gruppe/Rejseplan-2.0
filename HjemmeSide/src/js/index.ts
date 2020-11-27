@@ -5,6 +5,7 @@ import coord from "proj4";
 let baseurl: string = "http://xmlopen.rejseplanen.dk/bin/rest.exe";
 let format: string = "&format=json";
 
+
 var dms = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
 var utm = "+proj=utm +zone=32N +etrs=1989";
 var wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
@@ -30,6 +31,7 @@ async function getNearbyStops(x:number, y:number): Promise<void>{
   .then(response=> {
     let newLocation: Location;
     response.data.LocationList.StopLocation.forEach((location:any) => {
+      
       newLocation = new Location(location.name, fromWgsToDms(Number(location.y / 1000000), Number(location.x / 1000000)), location.distance);
       locationArray.push(newLocation)
     });
@@ -47,4 +49,25 @@ function fromWgsToDms(x:number, y:number): Array<number>{
   return convertedNum
 }
 
-getNearbyStops(55673059,12565557)
+//getNearbyStops(55673059,12565557)
+
+async function getLocation(): Promise<void> {
+  await navigator.geolocation.getCurrentPosition(position => {  
+    console.log(position); 
+
+    getNearbyStops(position.coords.longitude, position.coords.latitude)
+    getTrip(position.coords.longitude, position.coords.latitude)
+
+    return null
+  });
+}
+
+async function getTrip(dude:number, dude2:number): Promise<void>{
+  let path = baseurl + `/trip?originId=8600626&destCoordX=<55>&destCoordY=<12>&destCoordName=<RoskildeSt.>&format=json`
+  await Axios
+  .get(path)
+  .then(response => {
+    console.log(path)
+  })
+}
+getLocation();
