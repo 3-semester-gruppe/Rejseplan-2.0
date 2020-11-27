@@ -10658,7 +10658,24 @@ function fromWgsToDms(x, y) {
     let convertedNum = Object(proj4__WEBPACK_IMPORTED_MODULE_1__["default"])(wgs84, dms, [x, y]);
     return convertedNum;
 }
-getNearbyStops(55673059, 12565557);
+//getNearbyStops(55673059,12565557)
+async function getLocation() {
+    await navigator.geolocation.getCurrentPosition(position => {
+        console.log(position);
+        getNearbyStops(position.coords.longitude, position.coords.latitude);
+        getTrip(position.coords.longitude, position.coords.latitude);
+        return null;
+    });
+}
+async function getTrip(dude, dude2) {
+    let path = baseurl + `/trip?originId=8600626&destCoordX=<55>&destCoordY=<12>&destCoordName=<RoskildeSt.>&format=json`;
+    await axios__WEBPACK_IMPORTED_MODULE_0___default.a
+        .get(path)
+        .then(response => {
+        console.log(path);
+    });
+}
+getLocation();
 
 
 /***/ }),
