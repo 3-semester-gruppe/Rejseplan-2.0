@@ -47,4 +47,25 @@ function fromWgsToDms(x:number, y:number): Array<number>{
   return convertedNum
 }
 
-getNearbyStops(55673059,12565557)
+//getNearbyStops(55673059,12565557)
+
+async function getLocation(): Promise<void> {
+  await navigator.geolocation.getCurrentPosition(position => {  
+    console.log(position); 
+
+    getNearbyStops(position.coords.longitude, position.coords.latitude)
+    //getTrip(position.coords.longitude, position.coords.latitude)
+
+    return null
+  });
+}
+
+async function getTrip(dude:number, dude2:number): Promise<void>{
+  let path = baseurl + `/trip?originId=8600626&destCoordX=<55>&destCoordY=<12>&destCoordName=<RoskildeSt.>&format=json`
+  await Axios
+  .get(path)
+  .then(response => {
+    console.log(path)
+  })
+}
+getLocation();
