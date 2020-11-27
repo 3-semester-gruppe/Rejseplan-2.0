@@ -22,13 +22,14 @@
         </h1>
         <button v-on:click="getLibraryAsync()" class="btn btn-primary">Search</button>
         <button v-on:click="deleteLibraryAsync()" class="btn btn-primary">Done</button>
+        <button id="hastighedBtn" v-on:click="getHastighed()" class="btn btn-primary">Hastighed</button>
       </div>
       <library v-for="library in librarys" v-bind:key="library.id" v-bind:library="library"></library>
-      
-      <!-- <div :style="styleObject">
-        <p v-if="fan.humidity > 40">Det anbefalede fugtniveau er for højt</p>
-        <p v-if="fan.humidity < 10">Det anbefalede fugtniveau er for lavt</p>
-      </div> -->
+      <input id="distanceInput" type="text" v-model="distance">
+      <input id="departureTime" type="datetime-local" v-model="departureTime">
+      <p id="distance">{{ distance }}</p>
+      <p id="departure">{{ departureTime }}</p>
+      <p id="hastighed">{{ hastighed }}</p>
     </div>
   </div>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>

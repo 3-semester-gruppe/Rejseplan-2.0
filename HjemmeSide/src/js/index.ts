@@ -44,12 +44,10 @@ new Vue({
     el: "#app",
     data: {
         librarys: [],
-        styleObject: {
-            background: 'red',
-            color: 'white',
-            fontSize: '20px'
-        },
-        search: ""
+        search: "",
+        hastighed: null,
+        departureTime: null,
+        distance: null        
     },
     methods: {
         async getLibraryAsync(){
@@ -72,10 +70,16 @@ new Vue({
                 this.message = error.message;
                 alert(error.message);
             }
+        },
+        getHastighed(){
+            let departure : Date = new Date(this.departureTime);
+            let now : Date = new Date(Date.now());
+            let deltaTime : number = (departure.getTime() - now.getTime())/(1000 * 3600);
+            this.hastighed = Math.round((this.distance / 1000 / deltaTime) * 10)/10;
         }
     },
     created() {
-        // this.interval = setInterval(() => this.getLibraryAsync(), 10000);
+        // this.interval = setInterval(() => this.getHastighed(), 10);
     }
 })
 
