@@ -23,14 +23,26 @@ namespace CalculatorSeleniumTest
         public void TestMethod1()
         {
             IWebElement distance = driver.FindElement(By.Id("distance"));
+            IWebElement distanceInput = driver.FindElement(By.Id("distanceInput"));
+            distanceInput.Clear();
+            IWebElement departure = driver.FindElement(By.Id("departure"));
             IWebElement departureTime = driver.FindElement(By.Id("departureTime"));
-            IWebElement walkSpeed = driver.FindElement(By.Id("walkSpeed"));
-            IWebElement calculateButton = driver.FindElement(By.Id("go"));
-            calculateButton.Click();
-            Thread.Sleep(1000);
-            double deltaTime = (DateTime.Parse(departureTime.Text) - DateTime.Now).TotalSeconds;
+            departureTime.Clear();
+            IWebElement walkSpeed = driver.FindElement(By.Id("hastighed"));
+            IWebElement calculateButton = driver.FindElement(By.Id("hastighedBtn"));
 
-            Assert.AreEqual(Double.Parse(distance.Text)/deltaTime,Double.Parse(walkSpeed.Text),0.1);
+            distanceInput.SendKeys("3000");
+
+            departureTime.SendKeys(DateTime.Now.AddHours(3).ToString("dd/MM/yyyy"));
+            departureTime.SendKeys(Keys.Tab);
+            departureTime.SendKeys(DateTime.Now.AddHours(3).Hour.ToString());
+            departureTime.SendKeys(DateTime.Now.AddHours(3).Minute.ToString());
+            calculateButton.Click();
+
+
+            double deltaTime = ((DateTime.Parse(departure.Text) - DateTime.Now).TotalSeconds)/3600;
+
+            Assert.AreEqual((Double.Parse(distance.Text)/1000)/deltaTime,Double.Parse(walkSpeed.Text.Replace(".",",")),0.1);
         }
 
         [TestCleanup]
