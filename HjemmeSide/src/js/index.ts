@@ -1,3 +1,5 @@
+import coord from "proj4";
+
 import axios, {
     AxiosResponse,
     AxiosError
@@ -12,6 +14,8 @@ interface ILibrary {
     "timestamp": Date,
     "id": number
 }
+
+
 Vue.component('library', {
     props: ['library'],
     methods: {
