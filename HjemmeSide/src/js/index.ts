@@ -1,9 +1,5 @@
 import coord from "proj4";
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 import axios, {
     AxiosResponse,
     AxiosError
@@ -19,10 +15,6 @@ interface ILibrary {
     "id": number
 }
 
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
 Vue.component('library', {
     props: ['library'],
     methods: {
