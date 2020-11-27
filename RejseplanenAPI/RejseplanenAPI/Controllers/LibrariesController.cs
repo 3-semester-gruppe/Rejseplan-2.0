@@ -84,6 +84,21 @@ namespace RejseplanenAPI.Controllers
 
             return library;
         }
+        
+        [HttpDelete("Brugernavn/{substring}")]
+        public async Task DeleteLibrary(string substring)
+        {
+            while (true)
+            {
+                var library = _context.Rejseplanen.ToListAsync().Result.Find(lib => lib.Brugernavn.Equals(substring));
+                if (library == null)
+                {
+                    return;
+                }
+                _context.Rejseplanen.Remove(library);
+                await _context.SaveChangesAsync();
+            }
+        }
 
         private bool LibraryExists(int id)
         {
