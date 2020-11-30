@@ -10658,7 +10658,8 @@ new Vue({
         search: "",
         hastighed: null,
         departureTime: null,
-        distance: null
+        distance: null,
+        userDepartureTime: null
     },
     methods: {
         async getLibraryAsync() {
@@ -10685,7 +10686,18 @@ new Vue({
             let departure = new Date(this.departureTime);
             let now = new Date(Date.now());
             let deltaTime = (departure.getTime() - now.getTime()) / (1000 * 3600);
-            this.hastighed = Math.round((this.distance / 1000 / deltaTime) * 10) / 10;
+            this.hastighed = Math.round((this.distance / 1000 / deltaTime) * 100) / 100;
+            if (this.hastighed <= 5) {
+                this.hastighed = 5;
+            }
+            this.userDepartureTime = new Date(this.whenToLeave()).toUTCString();
+        },
+        whenToLeave() {
+            let timeToArrive = this.distance / 1000 / this.hastighed;
+            let departureTime = new Date(this.departureTime);
+            let timeToLeave = new Date();
+            timeToLeave.setTime(departureTime.getTime() - (((timeToArrive * 60) * 60) * 1000));
+            return timeToLeave;
         }
     },
     created() {
@@ -10743,7 +10755,7 @@ async function getTrip(dude, dude2) {
         console.log(path);
     });
 }
-getLocation();
+// getLocation(); 
 
 
 /***/ }),
