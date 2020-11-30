@@ -14,6 +14,12 @@ interface ILibrary {
     "timestamp": Date,
     "id": number
 }
+interface IStoppested {
+  name: string,
+  x: number,
+  y: number,
+  id: Number,
+}
 
 Vue.component('library', {
     props: ['library'],
@@ -40,6 +46,26 @@ Vue.component('library', {
 
 let baseUrl = 'http://localhost:49606/api/Libraries';
 
+let rejseplanenbaseurl: string = "http://xmlopen.rejseplanen.dk/bin/rest.exe";
+let format: string = "&format=json";
+
+var dms = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
+var utm = "+proj=utm +zone=32N +etrs=1989";
+var wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
+
+class Location{
+    name: string;
+    coord: Array<number>
+    distance: number;
+
+    constructor(Name: string, Coord: Array<number>, Distance: number){
+      this.name = Name;
+      this.coord = Coord
+      this.distance = Distance;
+    }
+}
+
+
 new Vue({
     // TypeScript compiler complains about Vue because the CDN link to Vue is in the html file.
     // Before the application runs this TypeScript file will be compiled into bundle.js
@@ -47,10 +73,20 @@ new Vue({
     el: "#app",
     data: {
         librarys: [],
-        search: "",
+        locationArray: [],
+        afgang: "",
+        ankomst: "",
         hastighed: null,
         departureTime: null,
-        distance: null        
+        distance: null,
+        longitude: null,
+        latitude: null,
+        afgang_stoppested: [],
+        ankomst_stoppested: []
+    },
+    created: function () {
+      // `this` points to the vm instance
+      this.getLocation()
     },
     methods: {
         async getLibraryAsync(){
@@ -79,79 +115,73 @@ new Vue({
             let now : Date = new Date(Date.now());
             let deltaTime : number = (departure.getTime() - now.getTime())/(1000 * 3600);
             this.hastighed = Math.round((this.distance / 1000 / deltaTime) * 10)/10;
+        },
+        created() {
+            // this.interval = setInterval(() => this.getHastighed(), 10);
+        },
+        getNearbyStops(x:number, y:number) {
+          let path: string = rejseplanenbaseurl + `/stopsNearby?coordX=${x}&coordY=${y}${format}`
+          axios
+          .get(path)
+          .then(response=> {
+            let newLocation: Location;
+            response.data.LocationList.StopLocation.forEach((location:any) => {
+              newLocation = new Location(location.name, this.fromWgsToDms(Number(location.y / 1000000), Number(location.x / 1000000)), location.distance);
+              this.locationArray.push(newLocation)
+            });
+          })
+          console.log(this.locationArray)
+        },
+        async asyncGetAfgang() {
+          let path: string = `http://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.afgang}&${format}`;
+          try {return axios.get<IStoppested[]>(path) }
+        },
+        async asyncGetAnkomst() {
+          let path: string = `http://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.ankomst}&${format}`;
+          try {return axios.get<IStoppested[]>(path) }
+        },
+        async getAfgang() {
+          let response  = await this.asyncGetAfgang();
+          console.log(response.data.LocationList.StopLocation)
+          this.afgang_stoppested = response.data.LocationList.StopLocation;
+        },
+        async getAnkomst() {
+          let response  = await this.asyncGetAnkomst();
+          console.log(response.data.LocationList.StopLocation)
+          this.ankomst_stoppested = response.data.LocationList.StopLocation;
+        },
+        fromDmsToWgs(x:number, y:number) {
+          let convertedNum = coord(dms, wgs84, [x,y]);
+          return convertedNum
+        },
+        fromWgsToDms(x:number, y:number) {
+          let convertedNum = coord(wgs84, dms, [x,y]);
+          return convertedNum
+        },
+        getLocation() {
+          navigator.geolocation.getCurrentPosition(position => {  
+            console.log(position.coords.longitude, position.coords.latitude); 
+            this.longitude = position.coords.longitude;
+            this.latitude = position.coords.latitude;
+
+            return [position.coords.longitude, position.coords.latitude]
+        
+            //getNearbyStops(position.coords.longitude, position.coords.latitude)
+            //getTrip(position.coords.longitude, position.coords.latitude)
+        
+          });
+        },
+        getDistance(location: string) {
+          if (this.latitude == null || this.longitude == null) {
+            this.getLocation()
+            this.getNearbyStops(this.longitude, this.latitude)
+          }
+          else {
+            this.getNearbyStops(this.longitude, this.latitude);
+
+          }          
+
         }
-    },
-    created() {
-        // this.interval = setInterval(() => this.getHastighed(), 10);
+      },
     }
 })
-
-
-
-let rejseplanenbaseurl: string = "http://xmlopen.rejseplanen.dk/bin/rest.exe";
-let format: string = "&format=json";
-
-var dms = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
-var utm = "+proj=utm +zone=32N +etrs=1989";
-var wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
-
-let locationArray: Array<Location> = []
-
-class Location{
-    name: string;
-    coord: Array<number>
-    distance: number;
-
-    constructor(Name: string, Coord: Array<number>, Distance: number){
-      this.name = Name;
-      this.coord = Coord
-      this.distance = Distance;
-    }
-}
-
-async function getNearbyStops(x:number, y:number): Promise<void>{
-  let path: string = rejseplanenbaseurl + `/stopsNearby?coordX=${x}&coordY=${y}${format}`
-  await axios
-  .get(path)
-  .then(response=> {
-    let newLocation: Location;
-    response.data.LocationList.StopLocation.forEach((location:any) => {
-      newLocation = new Location(location.name, fromWgsToDms(Number(location.y / 1000000), Number(location.x / 1000000)), location.distance);
-      locationArray.push(newLocation)
-    });
-  })
-  console.log(locationArray)
-}
-
-function fromDmsToWgs(x:number, y:number): Array<number>{
-  let convertedNum = coord(dms, wgs84, [x,y]);
-  return convertedNum
-}
-
-function fromWgsToDms(x:number, y:number): Array<number>{
-  let convertedNum = coord(wgs84, dms, [x,y]);
-  return convertedNum
-}
-
-//getNearbyStops(55673059,12565557)
-
-async function getLocation(): Promise<void> {
-  await navigator.geolocation.getCurrentPosition(position => {  
-    console.log(position); 
-
-    getNearbyStops(position.coords.longitude, position.coords.latitude)
-    //getTrip(position.coords.longitude, position.coords.latitude)
-
-    return null
-  });
-}
-
-async function getTrip(dude:number, dude2:number): Promise<void>{
-  let path = rejseplanenbaseurl + `/trip?originId=8600626&destCoordX=<55>&destCoordY=<12>&destCoordName=<RoskildeSt.>&format=json`
-  await axios
-  .get(path)
-  .then(response => {
-    console.log(path)
-  })
-}
-getLocation();

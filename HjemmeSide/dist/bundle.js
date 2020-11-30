@@ -10648,6 +10648,18 @@ Vue.component('library', {
     `
 });
 let baseUrl = 'http://localhost:49606/api/Libraries';
+let rejseplanenbaseurl = "http://xmlopen.rejseplanen.dk/bin/rest.exe";
+let format = "&format=json";
+var dms = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
+var utm = "+proj=utm +zone=32N +etrs=1989";
+var wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
+class Location {
+    constructor(Name, Coord, Distance) {
+        this.name = Name;
+        this.coord = Coord;
+        this.distance = Distance;
+    }
+}
 new Vue({
     // TypeScript compiler complains about Vue because the CDN link to Vue is in the html file.
     // Before the application runs this TypeScript file will be compiled into bundle.js
@@ -10655,10 +10667,20 @@ new Vue({
     el: "#app",
     data: {
         librarys: [],
-        search: "",
+        locationArray: [],
+        afgang: "",
+        ankomst: "",
         hastighed: null,
         departureTime: null,
-        distance: null
+        distance: null,
+        longitude: null,
+        latitude: null,
+        afgang_stoppested: [],
+        ankomst_stoppested: []
+    },
+    created: function () {
+        // `this` points to the vm instance
+        this.getLocation();
     },
     methods: {
         async getLibraryAsync() {
@@ -10686,64 +10708,78 @@ new Vue({
             let now = new Date(Date.now());
             let deltaTime = (departure.getTime() - now.getTime()) / (1000 * 3600);
             this.hastighed = Math.round((this.distance / 1000 / deltaTime) * 10) / 10;
+        },
+        created() {
+            // this.interval = setInterval(() => this.getHastighed(), 10);
+        },
+        getNearbyStops(x, y) {
+            let path = rejseplanenbaseurl + `/stopsNearby?coordX=${x}&coordY=${y}${format}`;
+            _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a
+                .get(path)
+                .then(response => {
+                let newLocation;
+                response.data.LocationList.StopLocation.forEach((location) => {
+                    newLocation = new Location(location.name, this.fromWgsToDms(Number(location.y / 1000000), Number(location.x / 1000000)), location.distance);
+                    this.locationArray.push(newLocation);
+                });
+            });
+            console.log(this.locationArray);
+        },
+        async asyncGetAfgang() {
+            let path = `http://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.afgang}&${format}`;
+            try {
+                return _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.get(path);
+            }
+            finally {
+            }
+        },
+        async asyncGetAnkomst() {
+            let path = `http://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.ankomst}&${format}`;
+            try {
+                return _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.get(path);
+            }
+            finally {
+            }
+        },
+        async getAfgang() {
+            let response = await this.asyncGetAfgang();
+            console.log(response.data.LocationList.StopLocation);
+            this.afgang_stoppested = response.data.LocationList.StopLocation;
+        },
+        async getAnkomst() {
+            let response = await this.asyncGetAnkomst();
+            console.log(response.data.LocationList.StopLocation);
+            this.ankomst_stoppested = response.data.LocationList.StopLocation;
+        },
+        fromDmsToWgs(x, y) {
+            let convertedNum = Object(proj4__WEBPACK_IMPORTED_MODULE_0__["default"])(dms, wgs84, [x, y]);
+            return convertedNum;
+        },
+        fromWgsToDms(x, y) {
+            let convertedNum = Object(proj4__WEBPACK_IMPORTED_MODULE_0__["default"])(wgs84, dms, [x, y]);
+            return convertedNum;
+        },
+        getLocation() {
+            navigator.geolocation.getCurrentPosition(position => {
+                console.log(position.coords.longitude, position.coords.latitude);
+                this.longitude = position.coords.longitude;
+                this.latitude = position.coords.latitude;
+                return [position.coords.longitude, position.coords.latitude];
+                //getNearbyStops(position.coords.longitude, position.coords.latitude)
+                //getTrip(position.coords.longitude, position.coords.latitude)
+            });
+        },
+        getDistance(location) {
+            if (this.latitude == null || this.longitude == null) {
+                this.getLocation();
+                this.getNearbyStops(this.longitude, this.latitude);
+            }
+            else {
+                this.getNearbyStops(this.longitude, this.latitude);
+            }
         }
     },
-    created() {
-        // this.interval = setInterval(() => this.getHastighed(), 10);
-    }
 });
-let rejseplanenbaseurl = "http://xmlopen.rejseplanen.dk/bin/rest.exe";
-let format = "&format=json";
-var dms = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
-var utm = "+proj=utm +zone=32N +etrs=1989";
-var wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
-let locationArray = [];
-class Location {
-    constructor(Name, Coord, Distance) {
-        this.name = Name;
-        this.coord = Coord;
-        this.distance = Distance;
-    }
-}
-async function getNearbyStops(x, y) {
-    let path = rejseplanenbaseurl + `/stopsNearby?coordX=${x}&coordY=${y}${format}`;
-    await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a
-        .get(path)
-        .then(response => {
-        let newLocation;
-        response.data.LocationList.StopLocation.forEach((location) => {
-            newLocation = new Location(location.name, fromWgsToDms(Number(location.y / 1000000), Number(location.x / 1000000)), location.distance);
-            locationArray.push(newLocation);
-        });
-    });
-    console.log(locationArray);
-}
-function fromDmsToWgs(x, y) {
-    let convertedNum = Object(proj4__WEBPACK_IMPORTED_MODULE_0__["default"])(dms, wgs84, [x, y]);
-    return convertedNum;
-}
-function fromWgsToDms(x, y) {
-    let convertedNum = Object(proj4__WEBPACK_IMPORTED_MODULE_0__["default"])(wgs84, dms, [x, y]);
-    return convertedNum;
-}
-//getNearbyStops(55673059,12565557)
-async function getLocation() {
-    await navigator.geolocation.getCurrentPosition(position => {
-        console.log(position);
-        getNearbyStops(position.coords.longitude, position.coords.latitude);
-        //getTrip(position.coords.longitude, position.coords.latitude)
-        return null;
-    });
-}
-async function getTrip(dude, dude2) {
-    let path = rejseplanenbaseurl + `/trip?originId=8600626&destCoordX=<55>&destCoordY=<12>&destCoordName=<RoskildeSt.>&format=json`;
-    await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a
-        .get(path)
-        .then(response => {
-        console.log(path);
-    });
-}
-getLocation();
 
 
 /***/ }),

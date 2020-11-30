@@ -18,11 +18,19 @@
     <div class="jumbotron">
       <div id="Search">
         <h1>
-          <input v-model="search" placeholder="Search">
+          <input v-model="afgang" placeholder="Afgang">
+          <input v-model="ankomst" placeholder="Ankomst">
+
         </h1>
         <button v-on:click="getLibraryAsync()" class="btn btn-primary">Search</button>
         <button v-on:click="deleteLibraryAsync()" class="btn btn-primary">Done</button>
         <button id="hastighedBtn" v-on:click="getHastighed()" class="btn btn-primary">Hastighed</button>
+        <button id="getLocation" v-on:click="getLocation()" class="btn btn-primary">Location</button>
+        <button v-on:click="getAfgang()" class="btn btn-primary">Afgang</button>
+        <button v-on:click="getAnkomst()" class="btn btn-primary">Ankomst</button>
+
+
+
       </div>
       <library v-for="library in librarys" v-bind:key="library.id" v-bind:library="library"></library>
       <input id="distanceInput" type="text" v-model="distance">
@@ -30,7 +38,25 @@
       <p id="distance">{{ distance }}</p>
       <p id="departure">{{ departureTime }}</p>
       <p id="hastighed">{{ hastighed }}</p>
+      <p id="xD">{{ longitude }}</p>
+      <p id="Lol">{{ latitude }}</p>
+
+      <ol v-if="afgang_stoppested">
+        <li v-for="stoppested in afgang_stoppested">
+          {{stoppested.name}}
+        </li>
+      </ol>
+      <ol v-if="ankomst_stoppested">
+        <li v-for="stoppested in ankomst_stoppested">
+          {{stoppested.name}}
+        </li>
+      </ol>
     </div>
+    <!--
+    <div>
+      <iframe height="450px " width="100%" src="https://webapp.rejseplanen.dk/webapp/">Rejseplanen</iframe>
+    </div>
+    -->
   </div>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
