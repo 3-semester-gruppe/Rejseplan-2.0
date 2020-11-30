@@ -1,14 +1,9 @@
-import coord from "proj4";
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 import axios, {
     AxiosResponse,
     AxiosError
 } from "../../node_modules/axios/index"
-axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded'
+axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded';
 axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 
 
@@ -19,10 +14,6 @@ interface ILibrary {
     "id": number
 }
 
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
 Vue.component('library', {
     props: ['library'],
     methods: {
