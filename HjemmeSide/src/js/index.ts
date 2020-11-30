@@ -1,6 +1,3 @@
-import coord from "proj4";
-
-
 import axios, {
     AxiosResponse,
     AxiosError
