@@ -76,6 +76,7 @@ new Vue({
     data: {
         librarys: [],
         locationArray: [],
+        search: "",
         afgang: "",
         ankomst: "",
         hastighed: null,
@@ -238,7 +239,6 @@ new Vue({
   
             this.distance = Math.round(this.calculateDistance(latitude, longitude, ankomst_Dms[0], ankomst_Dms[1]));  
           });
-
         }
       }
     }
