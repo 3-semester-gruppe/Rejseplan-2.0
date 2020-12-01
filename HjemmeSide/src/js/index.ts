@@ -16,10 +16,12 @@ interface ILibrary {
 }
 interface IStoppested {
   name: string,
-  x: number,
-  y: number,
+  x: string,
+  y: string,
   id: Number,
 }
+
+Vue.component('v-select', VueSelect.VueSelect)
 
 Vue.component('library', {
     props: ['library'],
@@ -134,15 +136,15 @@ new Vue({
         },
         async asyncGetAfgang() {
           let path: string = `http://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.afgang}&${format}`;
-          try {return axios.get<IStoppested[]>(path) }
+          try {return await axios.get<IStoppested[]>(path) }
         },
         async asyncGetAnkomst() {
           let path: string = `http://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.ankomst}&${format}`;
-          try {return axios.get<IStoppested[]>(path) }
+          try {return await axios.get<IStoppested[]>(path) }
         },
         async getAfgang() {
           let response  = await this.asyncGetAfgang();
-          console.log(response.data.LocationList.StopLocation)
+          console.log(response.data.LocationList.StopLocation);
           this.afgang_stoppested = response.data.LocationList.StopLocation;
         },
         async getAnkomst() {
@@ -182,6 +184,7 @@ new Vue({
           }          
 
         }
-      },
+      }
     }
 })
+

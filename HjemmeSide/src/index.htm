@@ -8,6 +8,8 @@
     <title>Rejseplan 2.0</title>
     
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/vue@latest"></script>
+    <script src="https://unpkg.com/vue-select@latest"></script>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/cerulean/bootstrap.min.css">
     <link rel="stylesheet" href="bundle.css">
@@ -18,8 +20,18 @@
     <div class="jumbotron">
       <div id="Search">
         <h1>
-          <input v-model="afgang" placeholder="Afgang">
-          <input v-model="ankomst" placeholder="Ankomst">
+          <input v-model="afgang" placeholder="Afgang" @keyup.enter="getAfgang()" list="afgang_stoppested">
+          <datalist id="afgang_stoppested">
+            <option v-for="stoppested in afgang_stoppested">
+              {{stoppested.name}}
+            </option>
+          </datalist>
+          <input v-model="ankomst" placeholder="Ankomst" @keyup.enter="getAnkomst()" list="ankomst_stoppested">
+          <datalist id="ankomst_stoppested">
+            <option v-for="stoppested in ankomst_stoppested">
+              {{stoppested.name}}
+            </option>
+          </datalist>
 
         </h1>
         <button v-on:click="getLibraryAsync()" class="btn btn-primary">Search</button>
@@ -48,7 +60,7 @@
       </ol>
       <ol v-if="ankomst_stoppested">
         <li v-for="stoppested in ankomst_stoppested">
-          {{stoppested.name}}
+          name = {{stoppested.name}}, x = {{stoppested.x}}, y = {{stoppested.y}}
         </li>
       </ol>
     </div>
