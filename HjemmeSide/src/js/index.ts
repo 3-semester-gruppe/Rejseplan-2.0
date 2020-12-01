@@ -1,3 +1,5 @@
+import coord from "proj4";
+
 import axios, {
     AxiosResponse,
     AxiosError
@@ -84,11 +86,13 @@ new Vue({
         afgang_stoppested: [],
         ankomst_stoppested: [],
         selected_ankomst: null
+    },
     created: function () {
       // `this` points to the vm instance
       //this.getLocation()
     },
     methods: {
+      
         async getLibraryAsync(){
             try {
                 axios.get<ILibrary[]>(baseUrl + "/brugernavn/" + this.search, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } ).then().catch(error => this.librarys = [])
@@ -111,6 +115,7 @@ new Vue({
             }
         },
         getHastighed(){
+          if (this.afgang == "")  {
               this.getDistanceFromLocation();
             }
             else {
@@ -132,7 +137,6 @@ new Vue({
           let timeToLeave : Date = new Date();
           timeToLeave.setTime(departureTime.getTime() - (((timeToArrive * 60)*60)*1000));
           return timeToLeave;
-    }
         },
         getAfgangTimeOut() {  
           if (this.timer) {
@@ -198,7 +202,6 @@ new Vue({
             this.longitude = position.coords.longitude;
             this.latitude = position.coords.latitude;
             //this.afgang = position.coords.longitude.toString() + " "  + position.coords.latitude.toString();
-        
           });
         },
         calculateDistance(lat1: number,lng1: number,lat2: number, lng2: number) {
@@ -244,7 +247,6 @@ new Vue({
             this.distance = Math.round(this.calculateDistance(latitude, longitude, ankomst_Dms[0], ankomst_Dms[1]));  
           });
         }
-      }
     }
 })
 
