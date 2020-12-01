@@ -80,7 +80,8 @@ new Vue({
             if(this.hastighed <= 5){
               this.hastighed = 5;
             }
-            this.userDepartureTime = new Date(this.whenToLeave()).toUTCString();
+            let whenToLeaveDate : Date = new Date(this.whenToLeave());
+            this.userDepartureTime = whenToLeaveDate;
         },
         whenToLeave() : Date{
           let timeToArrive : number = this.distance / 1000 /this.hastighed;
