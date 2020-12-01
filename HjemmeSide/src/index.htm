@@ -20,7 +20,7 @@
     <div class="jumbotron">
       <div id="Search">
         <h1>
-          <input v-model="afgang" placeholder="Afgang" @keyup="getAfgangTimeOut()" list="afgang_stoppested">
+          <input v-model="afgang" placeholder="Din lokation" @keyup="getAfgangTimeOut()" list="afgang_stoppested">
           <datalist id="afgang_stoppested">
             <option v-for="stoppested in afgang_stoppested">
               {{stoppested.name}}

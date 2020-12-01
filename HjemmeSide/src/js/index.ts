@@ -115,7 +115,12 @@ new Vue({
             }
         },
         getHastighed(){
-            this.getDistance()
+            if (this.afgang == "") {
+              this.getDistanceFromLocation();
+            }
+            else {
+              this.getDistance();
+            }
             let departure : Date = new Date(this.departureTime);
             let now : Date = new Date(Date.now());
             let deltaTime : number = (departure.getTime() - now.getTime())/(1000 * 3600);
@@ -187,11 +192,7 @@ new Vue({
             console.log(position.coords.longitude, position.coords.latitude); 
             this.longitude = position.coords.longitude;
             this.latitude = position.coords.latitude;
-            this.afgang = position.coords.longitude.toString() + " "  + position.coords.latitude.toString();
-            return [position.coords.longitude, position.coords.latitude]
-        
-            //getNearbyStops(position.coords.longitude, position.coords.latitude)
-            //getTrip(position.coords.longitude, position.coords.latitude)
+            //this.afgang = position.coords.longitude.toString() + " "  + position.coords.latitude.toString();
         
           });
         },
@@ -219,12 +220,25 @@ new Vue({
           this.selected_afgang =  this.afgang_stoppested.find( (i: any) => i.name === this.afgang);
           this.selected_ankomst = this.ankomst_stoppested.find ( (i: any) => i.name === this.ankomst); 
 
-
-          var afgang_Dms = this.fromWgsToDms(Number(this.selected_ankomst.y / 1000000), Number(this.selected_ankomst.x / 1000000));
-          var ankomst_Dms = this.fromWgsToDms(Number(this.selected_afgang.y / 1000000), Number(this.selected_afgang.x / 1000000));
+          var afgang_Dms = this.fromWgsToDms(Number(this.selected_afgang.y / 1000000), Number(this.selected_afgang.x / 1000000));
+          var ankomst_Dms = this.fromWgsToDms(Number(this.selected_ankomst.y / 1000000), Number(this.selected_ankomst.x / 1000000));
 
 
           this.distance = Math.round(this.calculateDistance(afgang_Dms[0], afgang_Dms[1], ankomst_Dms[0], ankomst_Dms[1]))
+        },
+        getDistanceFromLocation() {
+
+          navigator.geolocation.getCurrentPosition(position => {  
+            console.log(position.coords.longitude, position.coords.latitude); 
+            var longitude = position.coords.longitude;
+            var latitude = position.coords.latitude;
+
+            this.selected_ankomst = this.ankomst_stoppested.find ( (i: any) => i.name === this.ankomst); 
+            var ankomst_Dms = this.fromWgsToDms(Number(this.selected_ankomst.y / 1000000), Number(this.selected_ankomst.x / 1000000));
+  
+            this.distance = Math.round(this.calculateDistance(latitude, longitude, ankomst_Dms[0], ankomst_Dms[1]));  
+          });
+
         }
       }
     }
