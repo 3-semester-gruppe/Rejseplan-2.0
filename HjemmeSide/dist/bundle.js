@@ -10626,6 +10626,7 @@ __webpack_require__.r(__webpack_exports__);
 
 _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded';
 _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+Vue.component('v-select', VueSelect.VueSelect);
 Vue.component('library', {
     props: ['library'],
     methods: {},
@@ -10676,11 +10677,13 @@ new Vue({
         longitude: null,
         latitude: null,
         afgang_stoppested: [],
-        ankomst_stoppested: []
+        ankomst_stoppested: [],
+        selected_afgang: null,
+        selected_ankomst: null
     },
     created: function () {
         // `this` points to the vm instance
-        this.getLocation();
+        //this.getLocation()
     },
     methods: {
         async getLibraryAsync() {
@@ -10704,6 +10707,7 @@ new Vue({
             }
         },
         getHastighed() {
+            this.getDistance();
             let departure = new Date(this.departureTime);
             let now = new Date(Date.now());
             let deltaTime = (departure.getTime() - now.getTime()) / (1000 * 3600);
@@ -10711,6 +10715,24 @@ new Vue({
         },
         created() {
             // this.interval = setInterval(() => this.getHastighed(), 10);
+        },
+        getAfgangTimeOut() {
+            if (this.timer) {
+                clearTimeout(this.timer);
+                this.timer = null;
+            }
+            this.timer = setTimeout(() => {
+                this.getAfgang();
+            }, 500);
+        },
+        getAnkomstTimeOut() {
+            if (this.timer) {
+                clearTimeout(this.timer);
+                this.timer = null;
+            }
+            this.timer = setTimeout(() => {
+                this.getAnkomst();
+            }, 500);
         },
         getNearbyStops(x, y) {
             let path = rejseplanenbaseurl + `/stopsNearby?coordX=${x}&coordY=${y}${format}`;
@@ -10728,7 +10750,7 @@ new Vue({
         async asyncGetAfgang() {
             let path = `http://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.afgang}&${format}`;
             try {
-                return _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.get(path);
+                return await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.get(path);
             }
             finally {
             }
@@ -10736,7 +10758,7 @@ new Vue({
         async asyncGetAnkomst() {
             let path = `http://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.ankomst}&${format}`;
             try {
-                return _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.get(path);
+                return await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.get(path);
             }
             finally {
             }
@@ -10764,21 +10786,37 @@ new Vue({
                 console.log(position.coords.longitude, position.coords.latitude);
                 this.longitude = position.coords.longitude;
                 this.latitude = position.coords.latitude;
+                this.afgang = position.coords.longitude.toString() + " " + position.coords.latitude.toString();
                 return [position.coords.longitude, position.coords.latitude];
                 //getNearbyStops(position.coords.longitude, position.coords.latitude)
                 //getTrip(position.coords.longitude, position.coords.latitude)
             });
         },
-        getDistance(location) {
-            if (this.latitude == null || this.longitude == null) {
-                this.getLocation();
-                this.getNearbyStops(this.longitude, this.latitude);
-            }
-            else {
-                this.getNearbyStops(this.longitude, this.latitude);
-            }
+        calculateDistance(lat1, lng1, lat2, lng2) {
+            var radlat1 = Math.PI * lat1 / 180;
+            var radlat2 = Math.PI * lat2 / 180;
+            var radlon1 = Math.PI * lng1 / 180;
+            var radlon2 = Math.PI * lng2 / 180;
+            var theta = lng1 - lng2;
+            var radtheta = Math.PI * theta / 180;
+            var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+            dist = Math.acos(dist);
+            dist = dist * 180 / Math.PI;
+            dist = dist * 60 * 1.1515;
+            //Get in in kilometers
+            dist = dist * 1.609344;
+            //in meter
+            dist = dist * 1000;
+            return dist;
+        },
+        getDistance() {
+            this.selected_afgang = this.afgang_stoppested.find((i) => i.name === this.afgang);
+            this.selected_ankomst = this.ankomst_stoppested.find((i) => i.name === this.ankomst);
+            var afgang_Dms = this.fromWgsToDms(Number(this.selected_ankomst.y / 1000000), Number(this.selected_ankomst.x / 1000000));
+            var ankomst_Dms = this.fromWgsToDms(Number(this.selected_afgang.y / 1000000), Number(this.selected_afgang.x / 1000000));
+            this.distance = Math.round(this.calculateDistance(afgang_Dms[0], afgang_Dms[1], ankomst_Dms[0], ankomst_Dms[1]));
         }
-    },
+    }
 });
 
 
