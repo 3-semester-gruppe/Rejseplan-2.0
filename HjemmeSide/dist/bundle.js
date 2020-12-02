@@ -10680,7 +10680,13 @@ new Vue({
         latitude: null,
         afgang_stoppested: [],
         ankomst_stoppested: [],
-        selected_ankomst: null
+        selected_ankomst: null,
+        styleObject: {
+            background: '#800000',
+            color: 'white',
+            fontSize: '15px',
+        },
+        timeRemaining: null
     },
     created: function () {
         // `this` points to the vm instance
@@ -10723,6 +10729,9 @@ new Vue({
             }
             let whenToLeaveDate = new Date(this.whenToLeave());
             this.userDepartureTime = whenToLeaveDate;
+            //Tid tilbage i minutter
+            let timeSubtract = Math.round(((whenToLeaveDate.getTime() - departure.getTime()) / 1000) / 60) / -1;
+            this.timeRemaining = timeSubtract;
         },
         whenToLeave() {
             let timeToArrive = this.distance / 1000 / this.hastighed;
