@@ -22,7 +22,7 @@
 </style>
 <body>
   <div id="app" class="container">
-    <div class="jumbotron">
+    <!-- <div class="jumbotron">
       <div id="Search">
         <h1>
           <input v-model="search" placeholder="Search">
@@ -44,7 +44,7 @@
         <button v-on:click="deleteLibraryAsync()" class="btn btn-primary">Done</button>
 
 
-        <button id="hastighedBtn" v-on:click="getHastighed()" class="btn btn-primary">Hastighed</button>
+        <button id="hastighedBtn" v-on:click="getHastighed()" class="btn btn-primary">Hastighed</button> -->
         <!--
           <button id="getLocation" v-on:click="getLocation()" class="btn btn-primary">Location</button>
           <button v-on:click="getAfgang()" class="btn btn-primary">Afgang</button>
@@ -54,7 +54,7 @@
 
 
 
-      </div>
+      <!-- </div>
       <library v-for="library in librarys" v-bind:key="library.id" v-bind:library="library"></library>
       <input id="distanceInput" type="text" v-model="distance">
       <input id="departureTime" type="datetime-local" v-model="departureTime">
@@ -62,7 +62,7 @@
       <p id="departure">{{ departureTime }}</p>
       <p id="hastighed">{{ hastighed }}</p>
       <p id="userDepartureTime">{{ userDepartureTime }}</p>
-    </div>
+    </div> -->
 
     <div id="banner1" class="jumbotron text-center">
       <h1>Rejseplanen 2.0</h1>
@@ -72,22 +72,22 @@
     <div class="container">
       <div class="row">
         <div class="col-sm-4">
-          <input v-model="afgang" placeholder="Afgangssted" @keyup="getAfgangTimeOut()" list="afgang_stoppested">
+          <input id="afgangsstedInput" v-model="afgang" placeholder="Afgangssted" @keyup="getAfgangTimeOut()" list="afgang_stoppested">
           <datalist id="afgang_stoppested">
-            <option v-for="stoppested in afgang_stoppested">
+            <option id="afgangsstedName" v-for="stoppested in afgang_stoppested">
               {{stoppested.name}}
             </option>
           </datalist>
           <p></p>
-          <input v-model="ankomst" placeholder="Ankomststed" @keyup="getAnkomstTimeOut()" list="ankomst_stoppested">
+          <input id="ankomststedInput" v-model="ankomst" placeholder="Ankomststed" @keyup="getAnkomstTimeOut()" list="ankomst_stoppested">
           <datalist id="ankomst_stoppested">
-            <option v-for="stoppested in ankomst_stoppested">
+            <option id="ankomststedName" v-for="stoppested in ankomst_stoppested">
               {{stoppested.name}}
             </option>
           </datalist>
         </div>
         <div class="col-sm-4">
-          <input placeholder="Vælg afgangstidspunkt" class="textbox-n" type="text" onfocus="(this.type='datetime-local')" onblur="(this.type='text')" v-model="departureTime"/>
+          <input id="departureTime" placeholder="Vælg afgangstidspunkt" class="textbox-n" type="text" onfocus="(this.type='datetime-local')" onblur="(this.type='text')" v-model="departureTime"/>
         </div>
         <div class="col-sm-4">     
           <button id="hastighedBtn" v-on:click="getHastighed()" class="btn btn-primary">Beregn min hastighed og mit afgangstidspunkt</button>
@@ -102,7 +102,7 @@
           <p>For at kunne nå din destination i tide, anbefaler vi, at du i gennemsnit går:</p>
         <b><p id="hastighed">{{ hastighed }} <span v-if="hastighed"> km/t</span></p></b>
       <div :style="styleObject">
-        <p v-if="hastighed > 10">&nbsp;Vi estimerer, at du ikke vil nå dit ankomststed i tide</p>
+        <p id="maksHastighed">{{ maksHastighed }}</p>
       </div>
         </div>
         <div class="col-sm-4">
@@ -116,6 +116,28 @@
           <b><p id="distance">{{ distance }}<span v-if="distance"> meter</span></p></b>
           <p>på ca.:</p>
           <b><p id="timeRemaining">{{ timeRemaining }}<span v-if="timeRemaining"> minutter</span></p></b>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-4">
+          <h3>Gem din rejse</h3>
+          <p>Indtast dit brugernavn for at gemme rejsen:</p>
+          <input v-model="test" placeholder="Brugernavn" type="text">
+          <p></p>
+          <button id="hastighedBtn" v-on:click="getHastighed()" class="btn btn-primary">Gem rejsen</button>
+        </div>
+        <div class="col-sm-4">
+          <h3>Søg efter gemte rejser</h3>
+          <p>Indtast dit brugernavn for at søge efter gemte rejser:</p>
+          <input v-model="test" placeholder="Brugernavn" type="text">
+          <p></p>
+          <button id="hastighedBtn" v-on:click="getHastighed()" class="btn btn-primary">Søg efter rejser</button>
+        </div>
+        <div class="col-sm-4">
+          <h3>Oversigt</h3>
         </div>
       </div>
     </div>
