@@ -95,6 +95,34 @@ namespace CalculatorSeleniumTest
             departureTime.SendKeys(DateTime.Now.AddMinutes(-36).Minute.ToString());
         }
 
+        [TestMethod]
+        public void TestMaxHastighed()
+        {
+            IWebElement afgangsstedInput = driver.FindElement(By.Id("afgangsstedInput"));
+            afgangsstedInput.Clear();
+
+            IWebElement ankomststedInput = driver.FindElement(By.Id("ankomststedInput"));
+            ankomststedInput.Clear();
+
+            IWebElement departureTime = driver.FindElement(By.Id("departureTime"));
+            departureTime.Clear();
+
+            IWebElement calculateButton = driver.FindElement(By.Id("hastighedBtn"));
+
+            afgangsstedInput.SendKeys("Roskilde St.");
+            ankomststedInput.SendKeys("Aalborg St.");
+            departureTime.Click();
+            departureTime.SendKeys(DateTime.Now.AddHours(3).ToString("dd/MM/yyyy"));
+            departureTime.SendKeys(Keys.Tab);
+            departureTime.SendKeys(DateTime.Now.AddHours(3).Hour.ToString());
+            departureTime.SendKeys(DateTime.Now.AddHours(3).Minute.ToString());
+            IWebElement maksHastighed = driver.FindElement(By.Id("maksHastighed"));
+
+            calculateButton.Click();
+
+            Assert.AreEqual("Vi estimerer, at du ikke vil nå dit ankomststed i tide", maksHastighed.Text);
+        }
+
         [TestCleanup]
         public void TestTearDown()
         {

@@ -10686,7 +10686,8 @@ new Vue({
             color: 'white',
             fontSize: '15px',
         },
-        timeRemaining: null
+        timeRemaining: null,
+        maksHastighed: ""
     },
     created: function () {
         // `this` points to the vm instance
@@ -10726,6 +10727,12 @@ new Vue({
             this.hastighed = Math.round((this.distance / 1000 / deltaTime) * 100) / 100;
             if (this.hastighed <= 5) {
                 this.hastighed = 5;
+            }
+            if (this.hastighed > 10) {
+                this.maksHastighed = "Vi estimerer, at du ikke vil nå dit ankomststed i tide";
+            }
+            else {
+                this.maksHastighed = "";
             }
             let whenToLeaveDate = new Date(this.whenToLeave());
             this.userDepartureTime = whenToLeaveDate;
