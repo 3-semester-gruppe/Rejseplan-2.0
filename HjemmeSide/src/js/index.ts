@@ -1,4 +1,5 @@
 import coord from "proj4";
+import Axios from "../../node_modules/axios/index";
 
 import axios, {
     AxiosResponse,
@@ -58,6 +59,11 @@ Vue.component('library', {
 let baseUrl = 'http://localhost:49606/api/Libraries';
 let baseUrlTrip = 'http://localhost:49606/api/Trip';
 
+let openWeatherBaseUrl = "https://api.openweathermap.org/data/2.5/weather?"
+let openWeatherLat = "lat="
+let openWeatherLong = "&lon="
+let openWeatherApiKey = "&appid=412be2f2e33e80c87ba34e35ac054489"
+
 let rejseplanenbaseurl: string = "http://xmlopen.rejseplanen.dk/bin/rest.exe";
 let format: string = "&format=json";
 
@@ -78,7 +84,7 @@ class Location{
 }
 
 
-new Vue({
+var main = new Vue({
     // TypeScript compiler complains about Vue because the CDN link to Vue is in the html file.
     // Before the application runs this TypeScript file will be compiled into bundle.js
     // which is included at the bottom of the html file.
@@ -97,7 +103,17 @@ new Vue({
         latitude: null,
         afgang_stoppested: [],
         ankomst_stoppested: [],
+        selected_afgang: null,
         selected_ankomst: null,
+        temperature: null,
+        feels_like: null,
+        wind_speed: null,
+        wind_degree: null,
+        humidity: null,
+        pressure: null,
+        weather_type: "",
+        current_city: "",
+        current_dateTime: "",
         styleObject: {
           background: '#800000',
           color: 'white',
@@ -275,7 +291,6 @@ new Vue({
         },
         getLocation() {
           navigator.geolocation.getCurrentPosition(position => {  
-            console.log(position.coords.longitude, position.coords.latitude); 
             this.longitude = position.coords.longitude;
             this.latitude = position.coords.latitude;
             //this.afgang = position.coords.longitude.toString() + " "  + position.coords.latitude.toString();
@@ -301,7 +316,6 @@ new Vue({
             return dist;
         },
         getDistance() {
-
           this.selected_afgang =  this.afgang_stoppested.find( (i: any) => i.name === this.afgang);
           this.selected_ankomst = this.ankomst_stoppested.find ( (i: any) => i.name === this.ankomst); 
 
@@ -312,7 +326,6 @@ new Vue({
           this.distance = Math.round(this.calculateDistance(afgang_Dms[0], afgang_Dms[1], ankomst_Dms[0], ankomst_Dms[1]))
         },
         getDistanceFromLocation() {
-
           navigator.geolocation.getCurrentPosition(position => {  
             console.log(position.coords.longitude, position.coords.latitude); 
             var longitude = position.coords.longitude;
@@ -323,7 +336,41 @@ new Vue({
   
             this.distance = Math.round(this.calculateDistance(latitude, longitude, ankomst_Dms[0], ankomst_Dms[1]));  
           });
+        },
+        async getWeatherFromLatLong(){
+          let weatherData;
+          let dateTime = new Date();
+          let hours = dateTime.getHours().toString();
+          let minutes = dateTime.getMinutes().toString();
+          if(hours.length == 1){
+            hours = "0" + hours;
+          }
+          if(minutes.length == 1){
+            minutes = "0" + minutes;
+          }
+          navigator.geolocation.getCurrentPosition(async position => {  
+            let path = openWeatherBaseUrl + openWeatherLat + position.coords.latitude + openWeatherLong + position.coords.longitude + openWeatherApiKey;
+            await axios
+            .get(path)
+            .then(response => {
+              console.log(response.data);
+              weatherData = response.data.main;
+              this.current_city = response.data.name;
+              this.temperature = (weatherData.temp - 273).toFixed(2);
+              this.feels_like = (weatherData.feels_like - 273).toFixed(2);
+              this.humidity = weatherData.humidity;
+              this.pressure = weatherData.pressure;
+              this.wind_speed = response.data.wind.speed;
+              this.wind_degree = response.data.wind.deg;
+              this.weather_type = response.data.weather[0].main;
+              this.current_dateTime = `${dateTime.toLocaleString('en-us', {  weekday: 'long' })} ${hours + ":" + minutes}`;
+            })
+          });
+
         }
     }
 })
+
+main.getLocation();
+main.getWeatherFromLatLong();
 

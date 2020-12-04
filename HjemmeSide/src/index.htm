@@ -13,7 +13,7 @@
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/cerulean/bootstrap.min.css">
     <link rel="stylesheet" href="bundle.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js" integrity="sha512-F5QTlBqZlvuBEs9LQPqc1iZv2UMxcVXezbHzomzS6Df4MZMClge/8+gXrKw2fl5ysdk4rWjR0vKS7NNkfymaBQ==" crossorigin="anonymous"></script>
 </head>
 <style>
 #banner1 {
@@ -160,6 +160,46 @@
         </div>
       </div>
     </div>
+    <div class="weather" id="weather">
+      <div class="weatherHeader" id="weatherHeader">
+        <h6> {{current_dateTime}} </h6>
+        <h2> {{current_city}} </h2>
+      </div>
+        <div class="weatherMain" id="weatherMain">
+          <div class="weatherIcon" id="weatherIcon">
+            {{weather_type}}
+          </div>
+        <div class="weatherInfo" id="weatherInfo">
+          <div class="temp" id="temp">
+            <i class="fas fa-thermometer-half"></i>
+            {{temperature}} &#176;C <br>
+          </div>
+          <div class="feels" id="feels">
+            <i class="fas fa-temperature-low"></i>
+            {{feels_like}} &#176;C 
+          </div>
+          <div class="humid" id="humid">
+            <i class="fas fa-tint"></i>
+            {{humidity}}%
+          </div>
+          <div class="pressure" id="pressure">
+            <i class="far fa-gem"></i>
+            {{pressure}}p
+          </div>
+          <div class="wind" id="wind">
+            <i class="fas fa-wind"></i>
+            {{wind_speed}} m/s
+            <br>
+            <i class="fas fa-wind"></i>
+            {{wind_degree}}&#176;
+          </div>
+        </div>
+        </div>
+    </div>
+
+    <div>
+      <iframe height="450px " width="100%" src="https://webapp.rejseplanen.dk/webapp/">Rejseplanen</iframe>
+    </div>    
 
   </div>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
