@@ -19,16 +19,15 @@
 <style>
 #banner1 {
   background-image: url("https://3.bp.blogspot.com/-fH6gZXFHMZ8/Vw-Q9HMY2bI/AAAAAAAApak/VIAISlLlHlQCHjlQUu4Of2HDpMjgtVdTgCHM/s1600/world-travel-wallpaper-the-wallpaper-background.jpg");
-  border-radius: 0px;
 }
 .jumbotron {
-  padding-top: 10px !important;
-  padding-bottom: 10px !important;
+  padding-top: 5px;
+  padding-bottom: 0px;
+  margin-top: 5px;
 }
-.weather {
-  border-radius: 5px;
+.jumbotron, h2 {
+  font-weight: bold;
 }
-
 </style>
 <body>
   <div id="app" class="container">
@@ -75,46 +74,162 @@
     </div> -->
     
     <div id="banner1" class="jumbotron text-center">
-      <h1>Rejseplanen 2.0</h1>
+      <h2>Rejseplanen 2.0</h2>
       <p>Din virtuelle assistent når du skal på farten</p> 
+      <div class="weatherInBanner">
+
+        <div class="weather" id="weather">
+          <div class="weatherHeader" id="weatherHeader">
+            <h6> {{current_dateTime}} </h6>
+            <h2> {{current_city}} </h2>
+          </div>
+            <div class="weatherMain" id="weatherMain">
+              <div class="weatherIcon" id="weatherIcon">
+                {{weather_type}}
+              </div>
+            <div class="weatherInfo" id="weatherInfo">
+              <div class="temp" id="temp">
+                <i class="fas fa-thermometer-half"></i>
+                {{temperature}} &#176;C <br>
+              </div>
+              <div class="feels" id="feels">
+                <i class="fas fa-temperature-low"></i>
+                {{feels_like}} &#176;C 
+              </div>
+              <div class="humid" id="humid">
+                <i class="fas fa-tint"></i>
+                {{humidity}}%
+              </div>
+              <div class="pressure" id="pressure">
+                <i class="far fa-gem"></i>
+                {{pressure}}p
+              </div>
+              <div class="wind" id="wind">
+                <i class="fas fa-wind"></i>
+                {{wind_speed}} m/s
+                <br>
+                <i class="fas fa-wind"></i>
+                {{wind_degree}}&#176;
+              </div>
+            </div>
+            </div>
+        </div>
+    
+        <div class="weather" id="weather">
+          <div class="weatherHeader" id="weatherHeader">
+            <h6> {{dest_current_dateTime}} </h6>
+            <h2> {{dest_current_city}} </h2>
+          </div>
+            <div class="weatherMain" id="weatherMain">
+              <div class="weatherIcon" id="weatherIcon">
+                {{dest_weather_type}}
+              </div>
+            <div class="weatherInfo" id="weatherInfo">
+              <div class="temp" id="temp">
+                <i class="fas fa-thermometer-half"></i>
+                {{dest_temperature}} &#176;C <br>
+              </div>
+              <div class="feels" id="feels">
+                <i class="fas fa-temperature-low"></i>
+                {{dest_feels_like}} &#176;C 
+              </div>
+              <div class="humid" id="humid">
+                <i class="fas fa-tint"></i>
+                {{dest_humidity}}%
+              </div>
+              <div class="pressure" id="pressure">
+                <i class="far fa-gem"></i>
+                {{dest_pressure}}p
+              </div>
+              <div class="wind" id="wind">
+                <i class="fas fa-wind"></i>
+                {{dest_wind_speed}} m/s
+                <br>
+                <i class="fas fa-wind"></i>
+                {{dest_wind_degree}}&#176;
+              </div>
+            </div>
+            </div>
+        </div>
+      </div>
     </div>
 
-    <div class="weather" id="weather">
-      <div class="weatherHeader" id="weatherHeader">
-        <h6> {{current_dateTime}} </h6>
-        <h2> {{current_city}} </h2>
+    <!-- <div class="weatherInBanner">
+      <div class="weather" id="weather">
+        <div class="weatherHeader" id="weatherHeader">
+          <h6> {{current_dateTime}} </h6>
+          <h2> {{current_city}} </h2>
+        </div>
+          <div class="weatherMain" id="weatherMain">
+            <div class="weatherIcon" id="weatherIcon">
+              {{weather_type}}
+            </div>
+          <div class="weatherInfo" id="weatherInfo">
+            <div class="temp" id="temp">
+              <i class="fas fa-thermometer-half"></i>
+              {{temperature}} &#176;C <br>
+            </div>
+            <div class="feels" id="feels">
+              <i class="fas fa-temperature-low"></i>
+              {{feels_like}} &#176;C 
+            </div>
+            <div class="humid" id="humid">
+              <i class="fas fa-tint"></i>
+              {{humidity}}%
+            </div>
+            <div class="pressure" id="pressure">
+              <i class="far fa-gem"></i>
+              {{pressure}}p
+            </div>
+            <div class="wind" id="wind">
+              <i class="fas fa-wind"></i>
+              {{wind_speed}} m/s
+              <br>
+              <i class="fas fa-wind"></i>
+              {{wind_degree}}&#176;
+            </div>
+          </div>
+          </div>
       </div>
-        <div class="weatherMain" id="weatherMain">
-          <div class="weatherIcon" id="weatherIcon">
-            {{weather_type}}
-          </div>
-        <div class="weatherInfo" id="weatherInfo">
-          <div class="temp" id="temp">
-            <i class="fas fa-thermometer-half"></i>
-            {{temperature}} &#176;C <br>
-          </div>
-          <div class="feels" id="feels">
-            <i class="fas fa-temperature-low"></i>
-            {{feels_like}} &#176;C 
-          </div>
-          <div class="humid" id="humid">
-            <i class="fas fa-tint"></i>
-            {{humidity}}%
-          </div>
-          <div class="pressure" id="pressure">
-            <i class="far fa-gem"></i>
-            {{pressure}}p
-          </div>
-          <div class="wind" id="wind">
-            <i class="fas fa-wind"></i>
-            {{wind_speed}} m/s
-            <br>
-            <i class="fas fa-wind"></i>
-            {{wind_degree}}&#176;
-          </div>
+  
+      <div class="weather" id="weather">
+        <div class="weatherHeader" id="weatherHeader">
+          <h6> {{dest_current_dateTime}} </h6>
+          <h2> {{dest_current_city}} </h2>
         </div>
-        </div>
+          <div class="weatherMain" id="weatherMain">
+            <div class="weatherIcon" id="weatherIcon">
+              {{dest_weather_type}}
+            </div>
+          <div class="weatherInfo" id="weatherInfo">
+            <div class="temp" id="temp">
+              <i class="fas fa-thermometer-half"></i>
+              {{dest_temperature}} &#176;C <br>
+            </div>
+            <div class="feels" id="feels">
+              <i class="fas fa-temperature-low"></i>
+              {{dest_feels_like}} &#176;C 
+            </div>
+            <div class="humid" id="humid">
+              <i class="fas fa-tint"></i>
+              {{dest_humidity}}%
+            </div>
+            <div class="pressure" id="pressure">
+              <i class="far fa-gem"></i>
+              {{dest_pressure}}p
+            </div>
+            <div class="wind" id="wind">
+              <i class="fas fa-wind"></i>
+              {{dest_wind_speed}} m/s
+              <br>
+              <i class="fas fa-wind"></i>
+              {{dest_wind_degree}}&#176;
+            </div>
+          </div>
+          </div>
+      </div>
     </div>
+  -->
       <p></p>
 
     <div class="container-md well">
