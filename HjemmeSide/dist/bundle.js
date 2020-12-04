@@ -10690,10 +10690,11 @@ new Vue({
         timeRemaining: null,
         maksHastighed: "",
         trips: [],
-        formData: { id: null, userName: "", startDestination: "", endDestination: "", departureTime: null, userDepartureTime: null, averageSpeed: null, distanceToWalk: null, timeToWalk: null },
+        formData: { userName: "", startDestination: "", endDestination: "", departureTime: null, userDepartureTime: null, averageSpeed: null, distanceToWalk: null, timeToWalk: null },
         userNameToGetBy: "",
         removeTripId: null,
-        removeTripStatus: ""
+        removeTripStatus: "",
+        addTripStatus: ""
     },
     created: function () {
         // `this` points to the vm instance
@@ -10716,17 +10717,23 @@ new Vue({
         //POST Trip
         async addTripAsync() {
             try {
+                this.formData.startDestination = this.afgang;
+                this.formData.endDestination = this.ankomst;
+                this.formData.departureTime = this.departureTime;
+                this.formData.userDepartureTime = this.userDepartureTime;
+                this.formData.averageSpeed = this.hastighed;
+                this.formData.distanceToWalk = this.distance;
+                this.formData.timeToWalk = this.timeRemaining;
                 return await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.post(baseUrlTrip, this.formData);
             }
             catch (error) {
-                this.message = error.message;
-                alert(error.message);
+                this.addTripStatus = error.message;
+                this.addTripStatus = "Rejsen blev ikke gemt!";
             }
         },
         async addTrip() {
             let response = await this.addTripAsync();
-            this.addStatus = "Status: " + response.status + " " + response.statusText;
-            this.addMessage = JSON.stringify(response.data);
+            this.addTripStatus = "Status: " + response.status + " " + response.statusText;
         },
         //DELETE Trip
         async deleteTripAsync(deleteId) {
@@ -10734,6 +10741,7 @@ new Vue({
                 return await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.delete(baseUrlTrip + "/" + deleteId);
             }
             catch (error) {
+                this.removeTripStatus = error.message;
                 this.removeTripStatus = "Ugyldigt ID!";
             }
         },
