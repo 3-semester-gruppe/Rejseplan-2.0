@@ -18,8 +18,17 @@
 </head>
 <style>
 #banner1 {
-  background-image: url("https://3.bp.blogspot.com/-fH6gZXFHMZ8/Vw-Q9HMY2bI/AAAAAAAApak/VIAISlLlHlQCHjlQUu4Of2HDpMjgtVdTgCHM/s1600/world-travel-wallpaper-the-wallpaper-background.jpg")
+  background-image: url("https://3.bp.blogspot.com/-fH6gZXFHMZ8/Vw-Q9HMY2bI/AAAAAAAApak/VIAISlLlHlQCHjlQUu4Of2HDpMjgtVdTgCHM/s1600/world-travel-wallpaper-the-wallpaper-background.jpg");
+  border-radius: 0px;
 }
+.jumbotron {
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+.weather {
+  border-radius: 5px;
+}
+
 </style>
 <body>
   <div id="app" class="container">
@@ -64,12 +73,50 @@
       <p id="hastighed">{{ hastighed }}</p>
       <p id="userDepartureTime">{{ userDepartureTime }}</p>
     </div> -->
-
+    
     <div id="banner1" class="jumbotron text-center">
       <h1>Rejseplanen 2.0</h1>
       <p>Din virtuelle assistent når du skal på farten</p> 
     </div>
-      
+
+    <div class="weather" id="weather">
+      <div class="weatherHeader" id="weatherHeader">
+        <h6> {{current_dateTime}} </h6>
+        <h2> {{current_city}} </h2>
+      </div>
+        <div class="weatherMain" id="weatherMain">
+          <div class="weatherIcon" id="weatherIcon">
+            {{weather_type}}
+          </div>
+        <div class="weatherInfo" id="weatherInfo">
+          <div class="temp" id="temp">
+            <i class="fas fa-thermometer-half"></i>
+            {{temperature}} &#176;C <br>
+          </div>
+          <div class="feels" id="feels">
+            <i class="fas fa-temperature-low"></i>
+            {{feels_like}} &#176;C 
+          </div>
+          <div class="humid" id="humid">
+            <i class="fas fa-tint"></i>
+            {{humidity}}%
+          </div>
+          <div class="pressure" id="pressure">
+            <i class="far fa-gem"></i>
+            {{pressure}}p
+          </div>
+          <div class="wind" id="wind">
+            <i class="fas fa-wind"></i>
+            {{wind_speed}} m/s
+            <br>
+            <i class="fas fa-wind"></i>
+            {{wind_degree}}&#176;
+          </div>
+        </div>
+        </div>
+    </div>
+      <p></p>
+
     <div class="container-md well">
       <div class="row">
         <div class="col-sm-4">
@@ -93,6 +140,16 @@
         <div class="col-sm-4">     
           <button id="hastighedBtn" v-on:click="getHastighed()" class="btn btn-primary">Beregn min hastighed og mit afgangstidspunkt</button>
         </div>
+
+        <div class="container-md">
+          <div class="row">
+            <div class="col-sm-12">
+              <h3>Find afgangstidspunktet via Rejseplanen</h3>
+              <iframe height="150px" width="100%" src="https://webapp.rejseplanen.dk/webapp/">Rejseplanen</iframe>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -162,46 +219,6 @@
         </div>
       </div>
     </div>
-    <div class="weather" id="weather">
-      <div class="weatherHeader" id="weatherHeader">
-        <h6> {{current_dateTime}} </h6>
-        <h2> {{current_city}} </h2>
-      </div>
-        <div class="weatherMain" id="weatherMain">
-          <div class="weatherIcon" id="weatherIcon">
-            {{weather_type}}
-          </div>
-        <div class="weatherInfo" id="weatherInfo">
-          <div class="temp" id="temp">
-            <i class="fas fa-thermometer-half"></i>
-            {{temperature}} &#176;C <br>
-          </div>
-          <div class="feels" id="feels">
-            <i class="fas fa-temperature-low"></i>
-            {{feels_like}} &#176;C 
-          </div>
-          <div class="humid" id="humid">
-            <i class="fas fa-tint"></i>
-            {{humidity}}%
-          </div>
-          <div class="pressure" id="pressure">
-            <i class="far fa-gem"></i>
-            {{pressure}}p
-          </div>
-          <div class="wind" id="wind">
-            <i class="fas fa-wind"></i>
-            {{wind_speed}} m/s
-            <br>
-            <i class="fas fa-wind"></i>
-            {{wind_degree}}&#176;
-          </div>
-        </div>
-        </div>
-    </div>
-
-    <div>
-      <iframe height="450px " width="100%" src="https://webapp.rejseplanen.dk/webapp/">Rejseplanen</iframe>
-    </div>    
 
   </div>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
