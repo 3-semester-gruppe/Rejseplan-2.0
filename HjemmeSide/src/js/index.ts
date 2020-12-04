@@ -5,8 +5,35 @@ import axios, {
     AxiosResponse,
     AxiosError
 } from "../../node_modules/axios/index"
-axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded';
-axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+//axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded';
+//axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+
+let baseUrl = 'http://localhost:49606/api/Libraries';
+let baseUrlTrip = 'http://localhost:49606/api/Trip';
+
+let openWeatherBaseUrl = "https://api.openweathermap.org/data/2.5/weather?"
+let openWeatherLat = "lat="
+let openWeatherLong = "&lon="
+let openWeatherApiKey = "&appid=412be2f2e33e80c87ba34e35ac054489"
+
+let rejseplanenbaseurl: string = "http://xmlopen.rejseplanen.dk/bin/rest.exe";
+let format: string = "&format=json";
+
+var dms = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
+var utm = "+proj=utm +zone=32N +etrs=1989";
+var wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
+
+class Location{
+    name: string;
+    coord: Array<number>
+    distance: number;
+
+    constructor(Name: string, Coord: Array<number>, Distance: number){
+      this.name = Name;
+      this.coord = Coord
+      this.distance = Distance;
+    }
+}
 
 interface ITrip {
   "id": number,
@@ -56,34 +83,6 @@ Vue.component('library', {
     `
 })
 
-let baseUrl = 'http://localhost:49606/api/Libraries';
-let baseUrlTrip = 'http://localhost:49606/api/Trip';
-
-let openWeatherBaseUrl = "https://api.openweathermap.org/data/2.5/weather?"
-let openWeatherLat = "lat="
-let openWeatherLong = "&lon="
-let openWeatherApiKey = "&appid=412be2f2e33e80c87ba34e35ac054489"
-
-let rejseplanenbaseurl: string = "http://xmlopen.rejseplanen.dk/bin/rest.exe";
-let format: string = "&format=json";
-
-var dms = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
-var utm = "+proj=utm +zone=32N +etrs=1989";
-var wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
-
-class Location{
-    name: string;
-    coord: Array<number>
-    distance: number;
-
-    constructor(Name: string, Coord: Array<number>, Distance: number){
-      this.name = Name;
-      this.coord = Coord
-      this.distance = Distance;
-    }
-}
-
-
 var main = new Vue({
     // TypeScript compiler complains about Vue because the CDN link to Vue is in the html file.
     // Before the application runs this TypeScript file will be compiled into bundle.js
@@ -114,6 +113,15 @@ var main = new Vue({
         weather_type: "",
         current_city: "",
         current_dateTime: "",
+        dest_temperature: 0,
+        dest_feels_like: 0,
+        dest_wind_speed: 0,
+        dest_wind_degree: 0,
+        dest_humidity: 0,
+        dest_pressure: 0,
+        dest_weather_type: "Choose a station first",
+        dest_current_city: "City",
+        dest_current_dateTime: "Date",
         styleObject: {
           background: '#800000',
           color: 'white',
@@ -342,7 +350,8 @@ var main = new Vue({
             this.selected_ankomst = this.ankomst_stoppested.find ( (i: any) => i.name === this.ankomst); 
             var ankomst_Dms = this.fromWgsToDms(Number(this.selected_ankomst.y / 1000000), Number(this.selected_ankomst.x / 1000000));
   
-            this.distance = Math.round(this.calculateDistance(latitude, longitude, ankomst_Dms[0], ankomst_Dms[1]));  
+            this.distance = Math.round(this.calculateDistance(latitude, longitude, ankomst_Dms[0], ankomst_Dms[1])); 
+            this.getDestWeather(this.selected_ankomst); 
           });
         },
         async getWeatherFromLatLong(){
@@ -374,6 +383,35 @@ var main = new Vue({
               this.current_dateTime = `${dateTime.toLocaleString('en-us', {  weekday: 'long' })} ${hours + ":" + minutes}`;
             })
           });
+        },
+        async getDestWeather(destination:any){
+          let coords = this.fromWgsToDms(Number(destination.y / 1000000), Number(destination.x / 1000000));
+          let lat = coords[0];
+          let lng = coords[1];
+          let path = openWeatherBaseUrl + openWeatherLat + lat + openWeatherLong + lng + openWeatherApiKey;
+          let dateTime = new Date();
+          let hours = dateTime.getHours().toString();
+          let minutes = dateTime.getMinutes().toString();
+          if(hours.length == 1){
+            hours = "0" + hours;
+          }
+          if(minutes.length == 1){
+            minutes = "0" + minutes;
+          }
+          await axios
+          .get(path)
+          .then(response => {
+            let weatherData = response.data.main;
+            this.dest_current_city = response.data.name;
+            this.dest_temperature = (weatherData.temp - 273).toFixed(2);
+            this.dest_feels_like = (weatherData.feels_like - 273).toFixed(2);
+            this.dest_humidity = weatherData.humidity;
+            this.dest_pressure = weatherData.pressure;
+            this.dest_wind_speed = response.data.wind.speed;
+            this.dest_wind_degree = response.data.wind.deg;
+            this.dest_weather_type = response.data.weather[0].main;
+            this.dest_current_dateTime = `${dateTime.toLocaleString('en-us', {  weekday: 'long' })} ${hours + ":" + minutes}`;
+          })
 
         }
     }
