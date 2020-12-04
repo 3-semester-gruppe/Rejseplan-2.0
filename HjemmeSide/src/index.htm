@@ -126,6 +126,7 @@
           <h3>Gem din rejse</h3>
           <p>Indtast dit brugernavn for at gemme rejsen:</p>
           <input v-model="formData.userName" placeholder="Brugernavn" type="text">
+          <b><span v-if="addTrip">{{addTripStatus}}</span></b>
           <p></p>
           <button id="addBtn" v-on:click="addTrip()" class="btn btn-primary">Gem rejsen</button>
         </div>
@@ -153,7 +154,7 @@
           <h3>Oversigt</h3>
             <div v-if="trips.length">
                <div id="getAllResult" class="list-group-item" v-for="trip in trips">
-                  ID: {{trip.id}} | Username: {{trip.userName}} | Start destination: {{trip.startDestination}} | End destination: {{trip.endDestination}} | Departure time: {{trip.departureTime}} | User departure time: {{trip.userDepartureTime}} | Average speed: {{trip.averageSpeed }} | Distance to walk: {{trip.distanceToWalk}} | Time to walk: {{trip.timeToWalk}}
+                  ID: {{trip.id}} | Brugernavn: {{trip.userName}} | Afgangssted: {{trip.startDestination}} | Ankomststed: {{trip.endDestination}} | Afgangstidspunkt: {{trip.departureTime}} | Dit afgangstidspunkt: {{trip.userDepartureTime}} | Gennemsnitshastighed: {{trip.averageSpeed }} <span v-if="hastighed"> km/t</span> | Distance: {{trip.distanceToWalk}} <span v-if="distance"> meter</span> | Tid: {{trip.timeToWalk}} <span v-if="timeRemaining"> minutter</span>
                </div>
               </div>
             <div class="well" v-else>Du har ingen gemte rejser</div>

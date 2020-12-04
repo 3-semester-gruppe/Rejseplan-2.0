@@ -122,10 +122,11 @@ var main = new Vue({
         timeRemaining: null,
         maksHastighed: "",
         trips: [],
-        formData: { id: null, userName: "", startDestination: "", endDestination: "", departureTime: null, userDepartureTime: null, averageSpeed: null, distanceToWalk: null, timeToWalk: null},
+        formData: { userName: "", startDestination: "", endDestination: "", departureTime: null, userDepartureTime: null, averageSpeed: null, distanceToWalk: null, timeToWalk: null},
         userNameToGetBy: "",
         removeTripId: null,
-        removeTripStatus: ""
+        removeTripStatus: "",
+        addTripStatus: ""
     },
     created: function () {
       // `this` points to the vm instance
@@ -149,17 +150,23 @@ var main = new Vue({
         //POST Trip
         async addTripAsync() {
           try {
+            this.formData.startDestination = this.afgang;
+            this.formData.endDestination = this.ankomst;
+            this.formData.departureTime = this.departureTime;
+            this.formData.userDepartureTime = this.userDepartureTime;
+            this.formData.averageSpeed = this.hastighed;
+            this.formData.distanceToWalk = this.distance;
+            this.formData.timeToWalk = this.timeRemaining;
             return await axios.post<ITrip>(baseUrlTrip, this.formData);
           }
           catch (error: AxiosError) {
-            this.message = error.message;
-            alert(error.message);
+            this.addTripStatus = error.message;
+            this.addTripStatus = "Rejsen blev ikke gemt!"
           }
         },
         async addTrip() {
           let response = await this.addTripAsync();
-          this.addStatus = "Status: " + response.status + " " + response.statusText;
-          this.addMessage = JSON.stringify(response.data);  
+          this.addTripStatus = "Status: " + response.status + " " + response.statusText;  
         },
 
         //DELETE Trip
@@ -168,6 +175,7 @@ var main = new Vue({
             return await axios.delete<void>(baseUrlTrip + "/" + deleteId);
           }
           catch (error: AxiosError) {
+            this.removeTripStatus = error.message;
             this.removeTripStatus = "Ugyldigt ID!";
           }
         },
