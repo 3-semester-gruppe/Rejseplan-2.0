@@ -90,7 +90,7 @@ namespace RejseplanenAPI.Controllers
         {
             while (true)
             {
-                var library = _context.Rejseplanen.ToListAsync().Result.Find(lib => lib.Brugernavn.Equals(substring));
+                var library = _context.Rejseplanen.ToListAsync().Result.Find(lib => lib.Brugernavn.ToLower().Equals(substring.ToLower()));
                 if (library == null)
                 {
                     return;

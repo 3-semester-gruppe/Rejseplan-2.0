@@ -13,13 +13,19 @@
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/cerulean/bootstrap.min.css">
     <link rel="stylesheet" href="bundle.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 </head>
-
+<style>
+#banner1 {
+  background-image: url("https://3.bp.blogspot.com/-fH6gZXFHMZ8/Vw-Q9HMY2bI/AAAAAAAApak/VIAISlLlHlQCHjlQUu4Of2HDpMjgtVdTgCHM/s1600/world-travel-wallpaper-the-wallpaper-background.jpg")
+}
+</style>
 <body>
   <div id="app" class="container">
-    <div class="jumbotron">
+    <!-- <div class="jumbotron">
       <div id="Search">
         <h1>
+          <input v-model="search" placeholder="Search">
           <input v-model="afgang" placeholder="Din lokation" @keyup="getAfgangTimeOut()" list="afgang_stoppested">
           <datalist id="afgang_stoppested">
             <option v-for="stoppested in afgang_stoppested">
@@ -38,7 +44,7 @@
         <button v-on:click="deleteLibraryAsync()" class="btn btn-primary">Done</button>
 
 
-        <button id="hastighedBtn" v-on:click="getHastighed()" class="btn btn-primary">Hastighed</button>
+        <button id="hastighedBtn" v-on:click="getHastighed()" class="btn btn-primary">Hastighed</button> -->
         <!--
           <button id="getLocation" v-on:click="getLocation()" class="btn btn-primary">Location</button>
           <button v-on:click="getAfgang()" class="btn btn-primary">Afgang</button>
@@ -48,33 +54,112 @@
 
 
 
-      </div>
+      <!-- </div>
       <library v-for="library in librarys" v-bind:key="library.id" v-bind:library="library"></library>
       <input id="distanceInput" type="text" v-model="distance">
       <input id="departureTime" type="datetime-local" v-model="departureTime">
       <p id="distance">{{ distance }}<span v-if="distance"> meter</span></p>
       <p id="departure">{{ departureTime }}</p>
       <p id="hastighed">{{ hastighed }}</p>
-      <p id="xD">{{ longitude }}</p>
-      <p id="Lol">{{ latitude }}</p>
+      <p id="userDepartureTime">{{ userDepartureTime }}</p>
+    </div> -->
 
-      <!--
-      <ol v-if="afgang_stoppested">
-        <li v-for="stoppested in afgang_stoppested">
-          {{stoppested.name}}
-        </li>
-      </ol>
-      <ol v-if="ankomst_stoppested">
-        <li v-for="stoppested in ankomst_stoppested">
-          name = {{stoppested.name}}, x = {{stoppested.x}}, y = {{stoppested.y}}
-        </li>
-      </ol>
-      -->
+    <div id="banner1" class="jumbotron text-center">
+      <h1>Rejseplanen 2.0</h1>
+      <p>Din virtuelle assistent når du skal på farten</p> 
     </div>
-    
-    <div>
-      <iframe height="450px " width="100%" src="https://webapp.rejseplanen.dk/webapp/">Rejseplanen</iframe>
-    </div>    
+      
+    <div class="container-md well">
+      <div class="row">
+        <div class="col-sm-4">
+          <input id="afgangsstedInput" v-model="afgang" placeholder="Afgangssted" @keyup="getAfgangTimeOut()" list="afgang_stoppested">
+          <datalist id="afgang_stoppested">
+            <option id="afgangsstedName" v-for="stoppested in afgang_stoppested">
+              {{stoppested.name}}
+            </option>
+          </datalist>
+          <p></p>
+          <input id="ankomststedInput" v-model="ankomst" placeholder="Ankomststed" @keyup="getAnkomstTimeOut()" list="ankomst_stoppested">
+          <datalist id="ankomst_stoppested">
+            <option id="ankomststedName" v-for="stoppested in ankomst_stoppested">
+              {{stoppested.name}}
+            </option>
+          </datalist>
+        </div>
+        <div class="col-sm-4">
+          <input id="departureTime" placeholder="Vælg afgangstidspunkt" class="textbox-n" type="text" onfocus="(this.type='datetime-local')" onblur="(this.type='text')" v-model="departureTime"/>
+        </div>
+        <div class="col-sm-4">     
+          <button id="hastighedBtn" v-on:click="getHastighed()" class="btn btn-primary">Beregn min hastighed og mit afgangstidspunkt</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-md">
+      <div class="row">
+        <div class="col-sm-4">
+          <h3>Hvor hurtigt skal jeg gå?</h3>
+          <p>For at kunne nå din destination i tide, anbefaler vi, at du i gennemsnit går:</p>
+        <b><p id="hastighed">{{ hastighed }} <span v-if="hastighed"> km/t</span></p></b>
+      <div :style="styleObject">
+        <p id="maksHastighed">{{ maksHastighed }}</p>
+      </div>
+        </div>
+        <div class="col-sm-4">
+          <h3>Hvornår skal jeg afsted?</h3>
+          <p>Med den udregnede gennemsnitshastighed, anbefaler vi, at du tager afsted:</p>
+          <b><p id="userDepartureTime">{{ userDepartureTime }}</p></b>
+        </div>
+        <div class="col-sm-4">
+          <h3>Distance og tid</h3>
+          <p>Du skal gå:</p>
+          <b><p id="distance">{{ distance }}<span v-if="distance"> meter</span></p></b>
+          <p>På ca.:</p>
+          <b><p id="timeRemaining">{{ timeRemaining }}<span v-if="timeRemaining"> minutter</span></p></b>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-md">
+      <div class="row">
+        <div class="col-sm-4">
+          <h3>Gem din rejse</h3>
+          <p>Indtast dit brugernavn for at gemme rejsen:</p>
+          <input v-model="formData.userName" placeholder="Brugernavn" type="text">
+          <p></p>
+          <button id="addBtn" v-on:click="addTrip()" class="btn btn-primary">Gem rejsen</button>
+        </div>
+        <div class="col-sm-4">
+          <h3>Søg efter gemte rejser</h3>
+          <p>Indtast dit brugernavn for at søge efter gemte rejser:</p>
+          <input v-model="userNameToGetBy" placeholder="Brugernavn" type="text">
+          <p></p>
+          <button v-on:click="getByUserName(userNameToGetBy)" class="btn btn-primary">Søg efter rejser</button>
+        </div>
+        <div class="col-sm-4">
+          <h3>Slet en gemt rejse</h3>
+          <p>Indtast ID'et på rejsen for at slette den:</p>
+          <input v-model="removeTripId" placeholder="ID" type="text">
+          <b><span v-if="deleteTrip">{{removeTripStatus}}</span></b>
+          <p></p>
+          <button v-on:click="deleteTrip(removeTripId)" class="btn btn-primary">Slet rejsen</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-md">
+      <div class="row">
+        <div class="col-sm-8">
+          <h3>Oversigt</h3>
+            <div v-if="trips.length">
+               <div id="getAllResult" class="list-group-item" v-for="trip in trips">
+                  ID: {{trip.id}} | Username: {{trip.userName}} | Start destination: {{trip.startDestination}} | End destination: {{trip.endDestination}} | Departure time: {{trip.departureTime}} | User departure time: {{trip.userDepartureTime}} | Average speed: {{trip.averageSpeed }} | Distance to walk: {{trip.distanceToWalk}} | Time to walk: {{trip.timeToWalk}}
+               </div>
+              </div>
+            <div class="well" v-else>Du har ingen gemte rejser</div>
+        </div>
+      </div>
+    </div>
 
   </div>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -82,5 +167,7 @@
   <!-- Latest compiled and minified JavaScript -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   <script src="bundle.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </body>
 </html>

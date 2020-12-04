@@ -5,9 +5,20 @@ import axios, {
     AxiosResponse,
     AxiosError
 } from "../../node_modules/axios/index"
-// axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded'
-// axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded';
+axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 
+interface ITrip {
+  "id": number,
+  "userName": string,
+  "startDestination": string,
+  "endDestination": string,
+  "departureTime": Date,
+  "userDepartureTime": Date,
+  "averageSpeed": number,
+  "distanceToWalk": number,
+  "timeToWalk": number
+}
 
 interface ILibrary {
     "brugernavn": string,
@@ -18,8 +29,6 @@ interface ILibrary {
 interface IStoppested {
   name: string,
   x: string,
-  y: string,
-  id: Number,
 }
 
 Vue.component('v-select', VueSelect.VueSelect)
@@ -48,6 +57,7 @@ Vue.component('library', {
 })
 
 let baseUrl = 'http://localhost:49606/api/Libraries';
+let baseUrlTrip = 'http://localhost:49606/api/Trip';
 
 let openWeatherBaseUrl = "https://api.openweathermap.org/data/2.5/weather?"
 let openWeatherLat = "lat="
@@ -88,6 +98,7 @@ var main = new Vue({
         hastighed: null,
         departureTime: null,
         distance: null,
+        userDepartureTime: null,
         longitude: null,
         latitude: null,
         afgang_stoppested: [],
@@ -102,9 +113,69 @@ var main = new Vue({
         pressure: null,
         weather_type: "",
         current_city: "",
-        current_dateTime: ""
+        current_dateTime: "",
+        styleObject: {
+          background: '#800000',
+          color: 'white',
+          fontSize: '14px',
+        },
+        timeRemaining: null,
+        maksHastighed: "",
+        trips: [],
+        formData: { id: null, userName: "", startDestination: "", endDestination: "", departureTime: null, userDepartureTime: null, averageSpeed: null, distanceToWalk: null, timeToWalk: null},
+        userNameToGetBy: "",
+        removeTripId: null,
+        removeTripStatus: ""
+    },
+    created: function () {
+      // `this` points to the vm instance
+      //this.getLocation()
     },
     methods: {
+        //GET Trips by UserName
+        async getByUserNameAsync(userName: string) {
+          try {
+            return await axios.get<ITrip[]>(baseUrlTrip + "/UserName/" + userName);
+          }
+          catch (error: AxiosError) {
+            return {data:0};
+          }
+        },
+        async getByUserName(url: string) {
+          let response = await this.getByUserNameAsync(url);
+          this.trips = response.data;
+        },
+
+        //POST Trip
+        async addTripAsync() {
+          try {
+            return await axios.post<ITrip>(baseUrlTrip, this.formData);
+          }
+          catch (error: AxiosError) {
+            this.message = error.message;
+            alert(error.message);
+          }
+        },
+        async addTrip() {
+          let response = await this.addTripAsync();
+          this.addStatus = "Status: " + response.status + " " + response.statusText;
+          this.addMessage = JSON.stringify(response.data);  
+        },
+
+        //DELETE Trip
+        async deleteTripAsync(deleteId: number) {
+          try {
+            return await axios.delete<void>(baseUrlTrip + "/" + deleteId);
+          }
+          catch (error: AxiosError) {
+            this.removeTripStatus = "Ugyldigt ID!";
+          }
+        },
+        async deleteTrip(url: string) {
+          let response = await this.deleteTripAsync(url);
+          this.removeTripStatus = "Status: " + response.status + " " + response.statusText;
+        },
+
         async getLibraryAsync(){
             try {
                 axios.get<ILibrary[]>(baseUrl + "/brugernavn/" + this.search, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } ).then().catch(error => this.librarys = [])
@@ -127,7 +198,7 @@ var main = new Vue({
             }
         },
         getHastighed(){
-            if (this.afgang == "") {
+          if (this.afgang == "")  {
               this.getDistanceFromLocation();
             }
             else {
@@ -136,7 +207,29 @@ var main = new Vue({
             let departure : Date = new Date(this.departureTime);
             let now : Date = new Date(Date.now());
             let deltaTime : number = (departure.getTime() - now.getTime())/(1000 * 3600);
-            this.hastighed = Math.round((this.distance / 1000 / deltaTime) * 10)/10;
+            this.hastighed = Math.round((this.distance / 1000 / deltaTime) * 100)/100;
+            if(this.hastighed <= 5){
+              this.hastighed = 5;
+            }
+            if(this.hastighed > 10){
+              this.maksHastighed = "Vi estimerer, at du ikke vil nå dit ankomststed i tide. Vælg venligst et senere tidspunkt.";
+            }
+            else {
+              this.maksHastighed = "";
+            }
+            let whenToLeaveDate : Date = new Date(this.whenToLeave());
+            this.userDepartureTime = whenToLeaveDate;
+
+            //Tid tilbage i minutter
+            let timeSubtract : number = Math.round(((whenToLeaveDate.getTime() - departure.getTime())/1000)/60)/-1;
+            this.timeRemaining = timeSubtract;
+        },
+        whenToLeave() : Date{
+          let timeToArrive : number = this.distance / 1000 /this.hastighed;
+          let departureTime = new Date(this.departureTime);
+          let timeToLeave : Date = new Date();
+          timeToLeave.setTime(departureTime.getTime() - (((timeToArrive * 60)*60)*1000));
+          return timeToLeave;
         },
         getAfgangTimeOut() {  
           if (this.timer) {
@@ -275,7 +368,6 @@ var main = new Vue({
           });
 
         }
-      }
     }
 })
 
