@@ -37,5 +37,10 @@ namespace RejseplanenLibrary
             DistanceToWalk = distanceToWalk;
             TimeToWalk = timeToWalk;
         }
+
+        public override string ToString()
+        {
+            return $"Id: {Id}, UserName: {UserName}, StartDestination: {StartDestination}, EndDestination: {EndDestination}, DepartureTime: {DepartureTime}, UserDepartureTime: {UserDepartureTime}, AverageSpeed: {AverageSpeed}, DistanceToWalk: {DistanceToWalk}, TimeToWalk: {TimeToWalk}";
+        }
     }
 }
