@@ -10649,6 +10649,7 @@ Vue.component('library', {
     `
 });
 let baseUrl = 'http://localhost:49606/api/Libraries';
+let baseUrlTrip = 'http://localhost:49606/api/Trip';
 let rejseplanenbaseurl = "http://xmlopen.rejseplanen.dk/bin/rest.exe";
 let format = "&format=json";
 var dms = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
@@ -10684,16 +10685,62 @@ new Vue({
         styleObject: {
             background: '#800000',
             color: 'white',
-            fontSize: '15px',
+            fontSize: '14px',
         },
         timeRemaining: null,
-        maksHastighed: ""
+        maksHastighed: "",
+        trips: [],
+        formData: { id: null, userName: "", startDestination: "", endDestination: "", departureTime: null, userDepartureTime: null, averageSpeed: null, distanceToWalk: null, timeToWalk: null },
+        userNameToGetBy: "",
+        removeTripId: null,
+        removeTripStatus: ""
     },
     created: function () {
         // `this` points to the vm instance
         //this.getLocation()
     },
     methods: {
+        //GET Trips by UserName
+        async getByUserNameAsync(userName) {
+            try {
+                return await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.get(baseUrlTrip + "/UserName/" + userName);
+            }
+            catch (error) {
+                return { data: 0 };
+            }
+        },
+        async getByUserName(url) {
+            let response = await this.getByUserNameAsync(url);
+            this.trips = response.data;
+        },
+        //POST Trip
+        async addTripAsync() {
+            try {
+                return await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.post(baseUrlTrip, this.formData);
+            }
+            catch (error) {
+                this.message = error.message;
+                alert(error.message);
+            }
+        },
+        async addTrip() {
+            let response = await this.addTripAsync();
+            this.addStatus = "Status: " + response.status + " " + response.statusText;
+            this.addMessage = JSON.stringify(response.data);
+        },
+        //DELETE Trip
+        async deleteTripAsync(deleteId) {
+            try {
+                return await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.delete(baseUrlTrip + "/" + deleteId);
+            }
+            catch (error) {
+                this.removeTripStatus = "Ugyldigt ID!";
+            }
+        },
+        async deleteTrip(url) {
+            let response = await this.deleteTripAsync(url);
+            this.removeTripStatus = "Status: " + response.status + " " + response.statusText;
+        },
         async getLibraryAsync() {
             try {
                 _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.get(baseUrl + "/brugernavn/" + this.search, { headers: { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS", "Access-Control-Allow-Credentials": "true" } }).then().catch(error => this.librarys = [])
@@ -10729,7 +10776,7 @@ new Vue({
                 this.hastighed = 5;
             }
             if (this.hastighed > 10) {
-                this.maksHastighed = "Vi estimerer, at du ikke vil nå dit ankomststed i tide";
+                this.maksHastighed = "Vi estimerer, at du ikke vil nå dit ankomststed i tide. Vælg venligst et senere tidspunkt.";
             }
             else {
                 this.maksHastighed = "";

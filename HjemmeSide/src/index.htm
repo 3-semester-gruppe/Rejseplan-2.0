@@ -69,7 +69,7 @@
       <p>Din virtuelle assistent når du skal på farten</p> 
     </div>
       
-    <div class="container">
+    <div class="container-md well">
       <div class="row">
         <div class="col-sm-4">
           <input id="afgangsstedInput" v-model="afgang" placeholder="Afgangssted" @keyup="getAfgangTimeOut()" list="afgang_stoppested">
@@ -95,7 +95,7 @@
       </div>
     </div>
 
-    <div class="container">
+    <div class="container-md">
       <div class="row">
         <div class="col-sm-4">
           <h3>Hvor hurtigt skal jeg gå?</h3>
@@ -114,30 +114,49 @@
           <h3>Distance og tid</h3>
           <p>Du skal gå:</p>
           <b><p id="distance">{{ distance }}<span v-if="distance"> meter</span></p></b>
-          <p>på ca.:</p>
+          <p>På ca.:</p>
           <b><p id="timeRemaining">{{ timeRemaining }}<span v-if="timeRemaining"> minutter</span></p></b>
         </div>
       </div>
     </div>
 
-    <div class="container">
+    <div class="container-md">
       <div class="row">
         <div class="col-sm-4">
           <h3>Gem din rejse</h3>
           <p>Indtast dit brugernavn for at gemme rejsen:</p>
-          <input v-model="test" placeholder="Brugernavn" type="text">
+          <input v-model="formData.userName" placeholder="Brugernavn" type="text">
           <p></p>
-          <button id="hastighedBtn" v-on:click="getHastighed()" class="btn btn-primary">Gem rejsen</button>
+          <button id="addBtn" v-on:click="addTrip()" class="btn btn-primary">Gem rejsen</button>
         </div>
         <div class="col-sm-4">
           <h3>Søg efter gemte rejser</h3>
           <p>Indtast dit brugernavn for at søge efter gemte rejser:</p>
-          <input v-model="test" placeholder="Brugernavn" type="text">
+          <input v-model="userNameToGetBy" placeholder="Brugernavn" type="text">
           <p></p>
-          <button id="hastighedBtn" v-on:click="getHastighed()" class="btn btn-primary">Søg efter rejser</button>
+          <button v-on:click="getByUserName(userNameToGetBy)" class="btn btn-primary">Søg efter rejser</button>
         </div>
         <div class="col-sm-4">
+          <h3>Slet en gemt rejse</h3>
+          <p>Indtast ID'et på rejsen for at slette den:</p>
+          <input v-model="removeTripId" placeholder="ID" type="text">
+          <b><span v-if="deleteTrip">{{removeTripStatus}}</span></b>
+          <p></p>
+          <button v-on:click="deleteTrip(removeTripId)" class="btn btn-primary">Slet rejsen</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-md">
+      <div class="row">
+        <div class="col-sm-8">
           <h3>Oversigt</h3>
+            <div v-if="trips.length">
+               <div id="getAllResult" class="list-group-item" v-for="trip in trips">
+                  ID: {{trip.id}} | Username: {{trip.userName}} | Start destination: {{trip.startDestination}} | End destination: {{trip.endDestination}} | Departure time: {{trip.departureTime}} | User departure time: {{trip.userDepartureTime}} | Average speed: {{trip.averageSpeed }} | Distance to walk: {{trip.distanceToWalk}} | Time to walk: {{trip.timeToWalk}}
+               </div>
+              </div>
+            <div class="well" v-else>Du har ingen gemte rejser</div>
         </div>
       </div>
     </div>

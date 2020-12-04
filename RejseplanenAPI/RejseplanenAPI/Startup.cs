@@ -26,8 +26,11 @@ namespace RejseplanenAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //InMemory database
+            //InMemory database til Sensor
             services.AddDbContext<RejseplanenContext>(opt => opt.UseInMemoryDatabase("RejseplanenList"));
+
+            //InMemory database til Trip
+            services.AddDbContext<TripContext>(opt => opt.UseInMemoryDatabase("TripList"));
 
             //MiddleWare with policies
             services.AddCors(options =>
