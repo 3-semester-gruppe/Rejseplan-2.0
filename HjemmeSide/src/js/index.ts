@@ -413,10 +413,22 @@ var main = new Vue({
             this.dest_current_dateTime = `${dateTime.toLocaleString('en-us', {  weekday: 'long' })} ${hours + ":" + minutes}`;
           })
 
+        },
+      AddMinutesToDate(date:any, minutes:any) {
+          return new Date(date.getTime() + minutes*60000);
+      },
+      alertNotification(trip:ITrip){
+        if(this.trips != null && this.trips.length > 0){
+          console.log(this.trips);
+          let oldTime = new Date(trip.userDepartureTime);
+          let newTime = new Date(this.AddMinutesToDate(oldTime, 5));
+          let message1 = `${trip.startDestination} - ${trip.endDestination} \nDu skulle havde været ved dit stop ${trip.departureTime} \nEt stop på din rejse er forsinket`;
+          let message2 = `Din nye afgangstid er: ${newTime.toString()}`
+          alert(message1 + "\n" + message2);
         }
+      }
     }
 })
 
 main.getLocation();
 main.getWeatherFromLatLong();
-
