@@ -35,7 +35,7 @@ p{
 .weatherInBanner{
     display: flex;
     flex-direction: row;
-    margin-left: -6rem;
+    justify-content: center;
 }
 .weather{
     display: flex;
@@ -48,18 +48,18 @@ p{
     text-align: center;
 }
 .weatherHeader, h2{
-    color: red!important;
+    color: rgb(100,30,22);
     font-size: 2.5rem;
 }
 .weatherHeader, h6{
-    color: red!important;
+    color: rgb(100,30,22);
     font-size: 0.8rem;
 }
 .weatherMain{
     position: relative;
     display: flex;
     flex-direction: row;
-    color: rgb(2, 85, 74);
+    color: rgb(2,85,74);
     margin-top: 4rem;
 }
 .weatherIcon{
