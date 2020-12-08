@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryUnitTest", "LibraryU
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RejseplanenConsumer", "RejseplanenConsumer\RejseplanenConsumer.csproj", "{77418CD8-8BB5-4E2B-9BA0-22D3EDA73AC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TripConsumer", "TripConsumer\TripConsumer.csproj", "{F85C7E62-833A-45B4-8007-C11629ABAFB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TripConsumer", "TripConsumer\TripConsumer.csproj", "{F85C7E62-833A-45B4-8007-C11629ABAFB4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoqDataGen", "MoqDataGen\MoqDataGen.csproj", "{7A1A65AE-65DF-408D-9DFA-95A3F32EABC7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{F85C7E62-833A-45B4-8007-C11629ABAFB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F85C7E62-833A-45B4-8007-C11629ABAFB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F85C7E62-833A-45B4-8007-C11629ABAFB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A1A65AE-65DF-408D-9DFA-95A3F32EABC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A1A65AE-65DF-408D-9DFA-95A3F32EABC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A1A65AE-65DF-408D-9DFA-95A3F32EABC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A1A65AE-65DF-408D-9DFA-95A3F32EABC7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
