@@ -276,11 +276,20 @@
         </div>
         <div class="col-sm-4">
           <h3>Distance og tid</h3>
+          <div class="col-sm-4">
           <p>Du skal gå:</p>
           <b><p id="distance">{{ distance }}<span v-if="distance"> meter</span></p></b>
           <p>På ca.:</p>
           <b><p id="timeRemaining">{{ timeRemaining }}<span v-if="timeRemaining"> minutter</span></p></b>
+          </div>
+          <div class="col-sm-4">
+            <p>Du går:</p>
+            <b><p id="speed">{{ current_average_speed }}<span v-if="current_average_speed"> km/s</span></p></b>
+            <!-- <p>På ca.:</p>
+            <b><p id="timeRemaining">{{ timeRemaining }}<span v-if="timeRemaining"> minutter</span></p></b> -->
+          </div>
         </div>
+        
       </div>
     </div>
 

@@ -10717,13 +10717,38 @@ var main = new Vue({
         userNameToGetBy: "",
         removeTripId: null,
         removeTripStatus: "",
-        addTripStatus: ""
+        addTripStatus: "",
+        current_average_speed: 0,
+        start_time: Date(),
+        moving: true
     },
     created: function () {
-        // `this` points to the vm instance
-        //this.getLocation()
+        this.interval = setInterval(() => this.updateSpeedAsync(), 1000);
     },
     methods: {
+        //updates the current speed of the master user
+        async updateSpeedAsync() {
+            let totalMeasurements;
+            try {
+                totalMeasurements = await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.get(baseUrl + "/brugernavn/" + "henrik").then(response => { return response.data; }); //moq username / master user
+            }
+            catch (error) {
+            }
+            let start_time;
+            //sletter measurements før start
+            for (let index = 0; index < totalMeasurements.length; index++) {
+                if (totalMeasurements[index].timestamp < start_time) {
+                    totalMeasurements = totalMeasurements.filter(obj => obj !== totalMeasurements[index]);
+                    index--;
+                }
+            }
+            //Regner total hastighed ud og dividere for at finde gennemsnittet
+            let summedSpeed = 0;
+            for (let index = 0; index < totalMeasurements.length; index++) {
+                summedSpeed += totalMeasurements[index].hastighed;
+            }
+            this.current_average_speed = Math.floor(summedSpeed / totalMeasurements.length * 100) / 100;
+        },
         //GET Trips by UserName
         async getByUserNameAsync(userName) {
             try {
@@ -10793,6 +10818,12 @@ var main = new Vue({
             }
         },
         getHastighed() {
+            try {
+                _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.delete(baseUrl + "/brugernavn/" + "henrik"); //moq username / master user
+            }
+            catch (error) {
+            }
+            this.start_time = Date();
             if (this.afgang == "") {
                 this.getDistanceFromLocation();
             }

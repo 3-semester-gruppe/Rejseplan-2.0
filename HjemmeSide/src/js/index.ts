@@ -134,286 +134,307 @@ var main = new Vue({
         userNameToGetBy: "",
         removeTripId: null,
         removeTripStatus: "",
-        addTripStatus: ""
+        addTripStatus: "",
+        current_average_speed: 0,
+        start_time: Date(),
+        moving: true
     },
     created: function () {
-      // `this` points to the vm instance
-      //this.getLocation()
+      this.interval = setInterval(() => this.updateSpeedAsync(), 1000);
     },
     methods: {
-        //GET Trips by UserName
-        async getByUserNameAsync(userName: string) {
+      //updates the current speed of the master user
+      async updateSpeedAsync(){
+        let totalMeasurements : ILibrary[];
+        try {
+          totalMeasurements = await axios.get<ILibrary[]>(baseUrl + "/brugernavn/" + "henrik").then(response => {return response.data}); //moq username / master user
+        }
+        catch (error: AxiosError) {
+        }
+        let start_time : Date;
+        //sletter measurements før start
+        for (let index = 0; index < totalMeasurements.length; index++) {
+          if(totalMeasurements[index].timestamp < start_time){
+            totalMeasurements = totalMeasurements.filter(obj => obj !== totalMeasurements[index]);
+            index--;
+          }
+        }
+
+        //Regner total hastighed ud og dividere for at finde gennemsnittet
+        let summedSpeed : number = 0
+        for (let index = 0; index < totalMeasurements.length; index++) {
+          summedSpeed += totalMeasurements[index].hastighed
+        }
+        this.current_average_speed = Math.floor(summedSpeed / totalMeasurements.length * 100) / 100;
+      },
+      //GET Trips by UserName
+      async getByUserNameAsync(userName: string) {
+        try {
+          return await axios.get<ITrip[]>(baseUrlTrip + "/UserName/" + userName);
+        }
+        catch (error: AxiosError) {
+          return {data:0};
+        }
+      },
+      async getByUserName(url: string) {
+        let response = await this.getByUserNameAsync(url);
+        this.trips = response.data;
+      },
+      //POST Trip
+      async addTripAsync() {
+        try {
+          this.formData.startDestination = this.afgang;
+          this.formData.endDestination = this.ankomst;
+          this.formData.departureTime = this.departureTime;
+          this.formData.userDepartureTime = this.userDepartureTime;
+          this.formData.averageSpeed = this.hastighed;
+          this.formData.distanceToWalk = this.distance;
+          this.formData.timeToWalk = this.timeRemaining;
+          return await axios.post<ITrip>(baseUrlTrip, this.formData);
+        }
+        catch (error: AxiosError) {
+          this.addTripStatus = error.message;
+          this.addTripStatus = "Rejsen blev ikke gemt!"
+        }
+      },
+      async addTrip() {
+        let response = await this.addTripAsync();
+        this.addTripStatus = "Status: " + response.status + " " + response.statusText;  
+      },
+      //DELETE Trip
+      async deleteTripAsync(deleteId: number) {
+        try {
+          return await axios.delete<void>(baseUrlTrip + "/" + deleteId);
+        }
+        catch (error: AxiosError) {
+          this.removeTripStatus = error.message;
+          this.removeTripStatus = "Ugyldigt ID!";
+        }
+      },
+      async deleteTrip(url: string) {
+        let response = await this.deleteTripAsync(url);
+        this.removeTripStatus = "Status: " + response.status + " " + response.statusText;
+      },
+      async getLibraryAsync(){
           try {
-            return await axios.get<ITrip[]>(baseUrlTrip + "/UserName/" + userName);
+              axios.get<ILibrary[]>(baseUrl + "/brugernavn/" + this.search, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } ).then().catch(error => this.librarys = [])
+              .then(result => {this.librarys = result.data;})
+              .catch(error => {return []});
           }
-          catch (error: AxiosError) {
-            return {data:0};
+          catch ( error: AxiosError){
+              this.message = error.message;
+              alert(error.message);
           }
-        },
-        async getByUserName(url: string) {
-          let response = await this.getByUserNameAsync(url);
-          this.trips = response.data;
-        },
-
-        //POST Trip
-        async addTripAsync() {
+      },
+      async deleteLibraryAsync(){
           try {
-            this.formData.startDestination = this.afgang;
-            this.formData.endDestination = this.ankomst;
-            this.formData.departureTime = this.departureTime;
-            this.formData.userDepartureTime = this.userDepartureTime;
-            this.formData.averageSpeed = this.hastighed;
-            this.formData.distanceToWalk = this.distance;
-            this.formData.timeToWalk = this.timeRemaining;
-            return await axios.post<ITrip>(baseUrlTrip, this.formData);
+              axios.delete(baseUrl + "/brugernavn/" + this.search, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } ).then(error => this.librarys = []).catch(error => this.librarys = [])
           }
-          catch (error: AxiosError) {
-            this.addTripStatus = error.message;
-            this.addTripStatus = "Rejsen blev ikke gemt!"
+          catch ( error: AxiosError){
+              this.message = error.message;
+              alert(error.message);
           }
-        },
-        async addTrip() {
-          let response = await this.addTripAsync();
-          this.addTripStatus = "Status: " + response.status + " " + response.statusText;  
-        },
+      },
+      getHastighed(){
+        try {
+          axios.delete(baseUrl + "/brugernavn/" + "henrik"); //moq username / master user
+        }
+        catch (error: AxiosError) {
+        }
+        this.start_time = Date();
+        
 
-        //DELETE Trip
-        async deleteTripAsync(deleteId: number) {
-          try {
-            return await axios.delete<void>(baseUrlTrip + "/" + deleteId);
+        if (this.afgang == "")  {
+            this.getDistanceFromLocation();
           }
-          catch (error: AxiosError) {
-            this.removeTripStatus = error.message;
-            this.removeTripStatus = "Ugyldigt ID!";
+          else {
+            this.getDistance();
           }
-        },
-        async deleteTrip(url: string) {
-          let response = await this.deleteTripAsync(url);
-          this.removeTripStatus = "Status: " + response.status + " " + response.statusText;
-        },
-
-        async getLibraryAsync(){
-            try {
-                axios.get<ILibrary[]>(baseUrl + "/brugernavn/" + this.search, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } ).then().catch(error => this.librarys = [])
-                .then(result => {this.librarys = result.data;})
-                .catch(error => {return []});
-
-            }
-            catch ( error: AxiosError){
-                this.message = error.message;
-                alert(error.message);
-            }
-        },
-        async deleteLibraryAsync(){
-            try {
-                axios.delete(baseUrl + "/brugernavn/" + this.search, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } ).then(error => this.librarys = []).catch(error => this.librarys = [])
-            }
-            catch ( error: AxiosError){
-                this.message = error.message;
-                alert(error.message);
-            }
-        },
-        getHastighed(){
-          if (this.afgang == "")  {
-              this.getDistanceFromLocation();
-            }
-            else {
-              this.getDistance();
-            }
-            let departure : Date = new Date(this.departureTime);
-            let now : Date = new Date(Date.now());
-            let deltaTime : number = (departure.getTime() - now.getTime())/(1000 * 3600);
-            this.hastighed = Math.round((this.distance / 1000 / deltaTime) * 100)/100;
-            if(this.hastighed <= 5){
-              this.hastighed = 5;
-            }
-            if(this.hastighed > 10){
-              this.maksHastighed = "Vi estimerer, at du ikke vil nå dit ankomststed i tide. Vælg venligst et senere tidspunkt.";
-            }
-            else {
-              this.maksHastighed = "";
-            }
-            let whenToLeaveDate : Date = new Date(this.whenToLeave());
-            this.userDepartureTime = whenToLeaveDate;
-
-            //Tid tilbage i minutter
-            let timeSubtract : number = Math.round(((whenToLeaveDate.getTime() - departure.getTime())/1000)/60)/-1;
-            this.timeRemaining = timeSubtract;
-        },
-        whenToLeave() : Date{
-          let timeToArrive : number = this.distance / 1000 /this.hastighed;
-          let departureTime = new Date(this.departureTime);
-          let timeToLeave : Date = new Date();
-          timeToLeave.setTime(departureTime.getTime() - (((timeToArrive * 60)*60)*1000));
-          return timeToLeave;
-        },
-        getAfgangTimeOut() {  
-          if (this.timer) {
-              clearTimeout(this.timer);
-              this.timer = null;
+          let departure : Date = new Date(this.departureTime);
+          let now : Date = new Date(Date.now());
+          let deltaTime : number = (departure.getTime() - now.getTime())/(1000 * 3600);
+          this.hastighed = Math.round((this.distance / 1000 / deltaTime) * 100)/100;
+          if(this.hastighed <= 5){
+            this.hastighed = 5;
           }
-          this.timer = setTimeout(() => {
-              this.getAfgang();
-          }, 500);
-        },
-
-        getAnkomstTimeOut() {  
-          if (this.timer) {
-              clearTimeout(this.timer);
-              this.timer = null;
+          if(this.hastighed > 10){
+            this.maksHastighed = "Vi estimerer, at du ikke vil nå dit ankomststed i tide. Vælg venligst et senere tidspunkt.";
           }
-          this.timer = setTimeout(() => {
-              this.getAnkomst();
-          }, 500);
-        },        
-        getNearbyStops(x:number, y:number) {
-          let path: string = rejseplanenbaseurl + `/stopsNearby?coordX=${x}&coordY=${y}${format}`
-          axios
-          .get(path)
-          .then(response=> {
-            let newLocation: Location;
-            response.data.LocationList.StopLocation.forEach((location:any) => {
-              newLocation = new Location(location.name, this.fromWgsToDms(Number(location.y / 1000000), Number(location.x / 1000000)), location.distance);
-              this.locationArray.push(newLocation)
-            });
-          })
-          console.log(this.locationArray)
-        },
-        async asyncGetAfgang() {
-          let path: string = `http://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.afgang}&${format}`;
-          try {return await axios.get<IStoppested[]>(path) }
-        },
-        async asyncGetAnkomst() {
-          let path: string = `http://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.ankomst}&${format}`;
-          try {return await axios.get<IStoppested[]>(path) }
-        },
-        async getAfgang() {
-          let response  = await this.asyncGetAfgang();
-          console.log(response.data.LocationList.StopLocation);
-          this.afgang_stoppested = response.data.LocationList.StopLocation;
-        },
-        async getAnkomst() {
-          let response  = await this.asyncGetAnkomst();
-          console.log(response.data.LocationList.StopLocation)
-          this.ankomst_stoppested = response.data.LocationList.StopLocation;
-        },
-        fromDmsToWgs(x:number, y:number) {
-          let convertedNum = coord(dms, wgs84, [x,y]);
-          return convertedNum
-        },
-        fromWgsToDms(x:number, y:number) {
-          let convertedNum = coord(wgs84, dms, [x,y]);
-          return convertedNum
-        },
-        getLocation() {
-          navigator.geolocation.getCurrentPosition(position => {  
-            this.longitude = position.coords.longitude;
-            this.latitude = position.coords.latitude;
-            //this.afgang = position.coords.longitude.toString() + " "  + position.coords.latitude.toString();
+          else {
+            this.maksHastighed = "";
+          }
+          let whenToLeaveDate : Date = new Date(this.whenToLeave());
+          this.userDepartureTime = whenToLeaveDate;
+          //Tid tilbage i minutter
+          let timeSubtract : number = Math.round(((whenToLeaveDate.getTime() - departure.getTime())/1000)/60)/-1;
+          this.timeRemaining = timeSubtract;
+      },
+      whenToLeave() : Date{
+        let timeToArrive : number = this.distance / 1000 /this.hastighed;
+        let departureTime = new Date(this.departureTime);
+        let timeToLeave : Date = new Date();
+        timeToLeave.setTime(departureTime.getTime() - (((timeToArrive * 60)*60)*1000));
+        return timeToLeave;
+      },
+      getAfgangTimeOut() {  
+        if (this.timer) {
+            clearTimeout(this.timer);
+            this.timer = null;
+        }
+        this.timer = setTimeout(() => {
+            this.getAfgang();
+        }, 500);
+      },
+      getAnkomstTimeOut() {  
+        if (this.timer) {
+            clearTimeout(this.timer);
+            this.timer = null;
+        }
+        this.timer = setTimeout(() => {
+            this.getAnkomst();
+        }, 500);
+      },        
+      getNearbyStops(x:number, y:number) {
+        let path: string = rejseplanenbaseurl + `/stopsNearby?coordX=${x}&coordY=${y}${format}`
+        axios
+        .get(path)
+        .then(response=> {
+          let newLocation: Location;
+          response.data.LocationList.StopLocation.forEach((location:any) => {
+            newLocation = new Location(location.name, this.fromWgsToDms(Number(location.y / 1000000), Number(location.x / 1000000)), location.distance);
+            this.locationArray.push(newLocation)
           });
-        },
-        calculateDistance(lat1: number,lng1: number,lat2: number, lng2: number) {
-            var radlat1 = Math.PI * lat1 / 180;
-            var radlat2 = Math.PI * lat2 / 180;
-            var radlon1 = Math.PI * lng1 / 180;
-            var radlon2 = Math.PI * lng2 / 180;
-            var theta = lng1 - lng2;
-            var radtheta = Math.PI * theta / 180;
-            var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-            dist = Math.acos(dist);
-            dist = dist * 180 / Math.PI;
-            dist = dist * 60 * 1.1515;
-
-            //Get in in kilometers
-            dist = dist * 1.609344;
-            //in meter
-            dist = dist * 1000; 
-
-            return dist;
-        },
-        getDistance() {
-          this.selected_afgang =  this.afgang_stoppested.find( (i: any) => i.name === this.afgang);
+        })
+        console.log(this.locationArray)
+      },
+      async asyncGetAfgang() {
+        let path: string = `http://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.afgang}&${format}`;
+        try {return await axios.get<IStoppested[]>(path) }
+      },
+      async asyncGetAnkomst() {
+        let path: string = `http://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.ankomst}&${format}`;
+        try {return await axios.get<IStoppested[]>(path) }
+      },
+      async getAfgang() {
+        let response  = await this.asyncGetAfgang();
+        console.log(response.data.LocationList.StopLocation);
+        this.afgang_stoppested = response.data.LocationList.StopLocation;
+      },
+      async getAnkomst() {
+        let response  = await this.asyncGetAnkomst();
+        console.log(response.data.LocationList.StopLocation)
+        this.ankomst_stoppested = response.data.LocationList.StopLocation;
+      },
+      fromDmsToWgs(x:number, y:number) {
+        let convertedNum = coord(dms, wgs84, [x,y]);
+        return convertedNum
+      },
+      fromWgsToDms(x:number, y:number) {
+        let convertedNum = coord(wgs84, dms, [x,y]);
+        return convertedNum
+      },
+      getLocation() {
+        navigator.geolocation.getCurrentPosition(position => {  
+          this.longitude = position.coords.longitude;
+          this.latitude = position.coords.latitude;
+          //this.afgang = position.coords.longitude.toString() + " "  + position.coords.latitude.toString();
+        });
+      },
+      calculateDistance(lat1: number,lng1: number,lat2: number, lng2: number) {
+          var radlat1 = Math.PI * lat1 / 180;
+          var radlat2 = Math.PI * lat2 / 180;
+          var radlon1 = Math.PI * lng1 / 180;
+          var radlon2 = Math.PI * lng2 / 180;
+          var theta = lng1 - lng2;
+          var radtheta = Math.PI * theta / 180;
+          var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+          dist = Math.acos(dist);
+          dist = dist * 180 / Math.PI;
+          dist = dist * 60 * 1.1515;
+          //Get in in kilometers
+          dist = dist * 1.609344;
+          //in meter
+          dist = dist * 1000; 
+          return dist;
+      },
+      getDistance() {
+        this.selected_afgang =  this.afgang_stoppested.find( (i: any) => i.name === this.afgang);
+        this.selected_ankomst = this.ankomst_stoppested.find ( (i: any) => i.name === this.ankomst); 
+        var afgang_Dms = this.fromWgsToDms(Number(this.selected_afgang.y / 1000000), Number(this.selected_afgang.x / 1000000));
+        var ankomst_Dms = this.fromWgsToDms(Number(this.selected_ankomst.y / 1000000), Number(this.selected_ankomst.x / 1000000));
+        this.distance = Math.round(this.calculateDistance(afgang_Dms[0], afgang_Dms[1], ankomst_Dms[0], ankomst_Dms[1]))
+      },
+      getDistanceFromLocation() {
+        navigator.geolocation.getCurrentPosition(position => {  
+          console.log(position.coords.longitude, position.coords.latitude); 
+          var longitude = position.coords.longitude;
+          var latitude = position.coords.latitude;
           this.selected_ankomst = this.ankomst_stoppested.find ( (i: any) => i.name === this.ankomst); 
-
-          var afgang_Dms = this.fromWgsToDms(Number(this.selected_afgang.y / 1000000), Number(this.selected_afgang.x / 1000000));
           var ankomst_Dms = this.fromWgsToDms(Number(this.selected_ankomst.y / 1000000), Number(this.selected_ankomst.x / 1000000));
 
-
-          this.distance = Math.round(this.calculateDistance(afgang_Dms[0], afgang_Dms[1], ankomst_Dms[0], ankomst_Dms[1]))
-        },
-        getDistanceFromLocation() {
-          navigator.geolocation.getCurrentPosition(position => {  
-            console.log(position.coords.longitude, position.coords.latitude); 
-            var longitude = position.coords.longitude;
-            var latitude = position.coords.latitude;
-
-            this.selected_ankomst = this.ankomst_stoppested.find ( (i: any) => i.name === this.ankomst); 
-            var ankomst_Dms = this.fromWgsToDms(Number(this.selected_ankomst.y / 1000000), Number(this.selected_ankomst.x / 1000000));
-  
-            this.distance = Math.round(this.calculateDistance(latitude, longitude, ankomst_Dms[0], ankomst_Dms[1])); 
-            this.getDestWeather(this.selected_ankomst); 
-          });
-        },
-        async getWeatherFromLatLong(){
-          let weatherData;
-          let dateTime = new Date();
-          let hours = dateTime.getHours().toString();
-          let minutes = dateTime.getMinutes().toString();
-          if(hours.length == 1){
-            hours = "0" + hours;
-          }
-          if(minutes.length == 1){
-            minutes = "0" + minutes;
-          }
-          navigator.geolocation.getCurrentPosition(async position => {  
-            let path = openWeatherBaseUrl + openWeatherLat + position.coords.latitude + openWeatherLong + position.coords.longitude + openWeatherApiKey;
-            await axios
-            .get(path)
-            .then(response => {
-              console.log(response.data);
-              weatherData = response.data.main;
-              this.current_city = response.data.name;
-              this.temperature = (weatherData.temp - 273).toFixed(2);
-              this.feels_like = (weatherData.feels_like - 273).toFixed(2);
-              this.humidity = weatherData.humidity;
-              this.pressure = weatherData.pressure;
-              this.wind_speed = response.data.wind.speed;
-              this.wind_degree = response.data.wind.deg;
-              this.weather_type = response.data.weather[0].main;
-              this.current_dateTime = `${dateTime.toLocaleString('en-us', {  weekday: 'long' })} ${hours + ":" + minutes}`;
-            })
-          });
-        },
-        async getDestWeather(destination:any){
-          let coords = this.fromWgsToDms(Number(destination.y / 1000000), Number(destination.x / 1000000));
-          let lat = coords[0];
-          let lng = coords[1];
-          let path = openWeatherBaseUrl + openWeatherLat + lat + openWeatherLong + lng + openWeatherApiKey;
-          let dateTime = new Date();
-          let hours = dateTime.getHours().toString();
-          let minutes = dateTime.getMinutes().toString();
-          if(hours.length == 1){
-            hours = "0" + hours;
-          }
-          if(minutes.length == 1){
-            minutes = "0" + minutes;
-          }
+          this.distance = Math.round(this.calculateDistance(latitude, longitude, ankomst_Dms[0], ankomst_Dms[1])); 
+          this.getDestWeather(this.selected_ankomst); 
+        });
+      },
+      async getWeatherFromLatLong(){
+        let weatherData;
+        let dateTime = new Date();
+        let hours = dateTime.getHours().toString();
+        let minutes = dateTime.getMinutes().toString();
+        if(hours.length == 1){
+          hours = "0" + hours;
+        }
+        if(minutes.length == 1){
+          minutes = "0" + minutes;
+        }
+        navigator.geolocation.getCurrentPosition(async position => {  
+          let path = openWeatherBaseUrl + openWeatherLat + position.coords.latitude + openWeatherLong + position.coords.longitude + openWeatherApiKey;
           await axios
           .get(path)
           .then(response => {
-            let weatherData = response.data.main;
-            this.dest_current_city = response.data.name;
-            this.dest_temperature = (weatherData.temp - 273).toFixed(2);
-            this.dest_feels_like = (weatherData.feels_like - 273).toFixed(2);
-            this.dest_humidity = weatherData.humidity;
-            this.dest_pressure = weatherData.pressure;
-            this.dest_wind_speed = response.data.wind.speed;
-            this.dest_wind_degree = response.data.wind.deg;
-            this.dest_weather_type = response.data.weather[0].main;
-            this.dest_current_dateTime = `${dateTime.toLocaleString('en-us', {  weekday: 'long' })} ${hours + ":" + minutes}`;
+            console.log(response.data);
+            weatherData = response.data.main;
+            this.current_city = response.data.name;
+            this.temperature = (weatherData.temp - 273).toFixed(2);
+            this.feels_like = (weatherData.feels_like - 273).toFixed(2);
+            this.humidity = weatherData.humidity;
+            this.pressure = weatherData.pressure;
+            this.wind_speed = response.data.wind.speed;
+            this.wind_degree = response.data.wind.deg;
+            this.weather_type = response.data.weather[0].main;
+            this.current_dateTime = `${dateTime.toLocaleString('en-us', {  weekday: 'long' })} ${hours + ":" + minutes}`;
           })
-
+        });
+      },
+      async getDestWeather(destination:any){
+        let coords = this.fromWgsToDms(Number(destination.y / 1000000), Number(destination.x / 1000000));
+        let lat = coords[0];
+        let lng = coords[1];
+        let path = openWeatherBaseUrl + openWeatherLat + lat + openWeatherLong + lng + openWeatherApiKey;
+        let dateTime = new Date();
+        let hours = dateTime.getHours().toString();
+        let minutes = dateTime.getMinutes().toString();
+        if(hours.length == 1){
+          hours = "0" + hours;
         }
+        if(minutes.length == 1){
+          minutes = "0" + minutes;
+        }
+        await axios
+        .get(path)
+        .then(response => {
+          let weatherData = response.data.main;
+          this.dest_current_city = response.data.name;
+          this.dest_temperature = (weatherData.temp - 273).toFixed(2);
+          this.dest_feels_like = (weatherData.feels_like - 273).toFixed(2);
+          this.dest_humidity = weatherData.humidity;
+          this.dest_pressure = weatherData.pressure;
+          this.dest_wind_speed = response.data.wind.speed;
+          this.dest_wind_degree = response.data.wind.deg;
+          this.dest_weather_type = response.data.weather[0].main;
+          this.dest_current_dateTime = `${dateTime.toLocaleString('en-us', {  weekday: 'long' })} ${hours + ":" + minutes}`;
+        })
+      }
     }
 })
 
