@@ -176,7 +176,10 @@ var main = new Vue({
         if (this.current_average_speed < this.hastighed) {
           this.idealSpeed = "Du går for langsomt!";
         }
-        else if (this.current_average_speed > this.hastighed) {
+        else if (this.current_average_speed <= this.hastighed+1) {
+          this.idealSpeed = "Du går tilpas hurtigt";
+        }
+        else if(this.current_average_speed > this.hastighed+1){
           this.idealSpeed = "Du går for hurtigt!";
         }
         else {
