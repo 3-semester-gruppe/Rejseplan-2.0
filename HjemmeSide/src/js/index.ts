@@ -8,8 +8,8 @@ import axios, {
 //axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded';
 //axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 
-let baseUrl = 'http://localhost:49606/api/Libraries';
-let baseUrlTrip = 'http://localhost:49606/api/Trip';
+let baseUrl = 'https://rejseplanenapi20201207103315.azurewebsites.net/api/libraries/';
+let baseUrlTrip = 'https://rejseplanenapi20201207103315.azurewebsites.net/api/Trip/';
 
 let openWeatherBaseUrl = "https://api.openweathermap.org/data/2.5/weather?"
 let openWeatherLat = "lat="
