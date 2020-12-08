@@ -16,17 +16,17 @@ namespace MoqDataGen
         static void Main(string[] args)
         {
             Random random = new Random(DateTime.Now.Millisecond);
-            Post();
+            Task.Factory.StartNew(() => Post());
             bool upOrDown = true;
             while (true)
             {
                 if (upOrDown)
                 {
-                    speed += Convert.ToDouble(random.Next(-10, 15) / 100); 
+                    speed += Convert.ToDouble(random.Next(-10, 15)) / 100; 
                 }
                 else
                 {
-                    speed -= Convert.ToDouble(random.Next(-10, 15) / 100);
+                    speed -= Convert.ToDouble(random.Next(-10, 15)) / 100;
                 }
 
                 if (speed > 10)
@@ -43,11 +43,10 @@ namespace MoqDataGen
                 {
                     upOrDown = !upOrDown;
                 }
-                Console.WriteLine(speed);
             }
         }
 
-        static async void Post()
+        static async Task Post()
         {
             using (HttpClient client = new HttpClient())
             {
