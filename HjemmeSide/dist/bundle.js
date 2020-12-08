@@ -10710,6 +10710,11 @@ var main = new Vue({
             color: 'white',
             fontSize: '14px',
         },
+        styleObject2: {
+            background: '#336eff',
+            color: 'white',
+            fontSize: '14px',
+        },
         timeRemaining: null,
         maksHastighed: "",
         trips: [],
@@ -10720,7 +10725,8 @@ var main = new Vue({
         addTripStatus: "",
         current_average_speed: 0,
         start_time: Date(),
-        moving: true
+        moving: true,
+        idealSpeed: ""
     },
     created: function () {
         this.interval = setInterval(() => this.updateSpeedAsync(), 1000);
@@ -10748,6 +10754,15 @@ var main = new Vue({
                 summedSpeed += totalMeasurements[index].hastighed;
             }
             this.current_average_speed = Math.floor(summedSpeed / totalMeasurements.length * 100) / 100;
+            if (this.current_average_speed < this.hastighed) {
+                this.idealSpeed = "Du går for langsomt!";
+            }
+            else if (this.current_average_speed > this.hastighed) {
+                this.idealSpeed = "Du går for hurtigt!";
+            }
+            else {
+                this.idealSpeed = "";
+            }
         },
         //GET Trips by UserName
         async getByUserNameAsync(userName) {
