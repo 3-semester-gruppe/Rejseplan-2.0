@@ -22,7 +22,7 @@ namespace LibraryUnitTest
         [TestMethod]
         public void IdValueTest()
         {
-            Assert.AreEqual(1, _library.Id);
+            Assert.AreEqual(3, _library.Id);
 
             try
             {
@@ -93,7 +93,7 @@ namespace LibraryUnitTest
             }
             catch (ArgumentNullException ex)
             {
-                Assert.AreEqual("Brugernavn må ikke være tomt eller have white space (Parameter 'Brugernavn')",
+                Assert.AreEqual("Brugernavn må ikke stå tomt eller have white space (Parameter 'Brugernavn')",
                     ex.Message);
             }
 
@@ -105,7 +105,7 @@ namespace LibraryUnitTest
             }
             catch (ArgumentNullException ex)
             {
-                Assert.AreEqual("Brugernavn må ikke være tomt eller have white space (Parameter 'Brugernavn')",
+                Assert.AreEqual("Brugernavn må ikke stå tomt eller have white space (Parameter 'Brugernavn')",
                     ex.Message);
             }
         }

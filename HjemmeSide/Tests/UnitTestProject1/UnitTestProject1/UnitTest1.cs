@@ -138,6 +138,95 @@ namespace RejseplanenSeleniumTest
             Assert.AreEqual("Vi estimerer, at du ikke vil nå dit ankomststed i tide. Vælg venligst et senere tidspunkt.", maksHastighed.Text);
         }
 
+        [TestMethod]
+        public void TestFoelgEnRejse()
+        {
+            IWebElement afgangssted = driver.FindElement(By.Id("afgangsstedInput"));
+            afgangssted.Clear();
+            IWebElement ankomststed = driver.FindElement(By.Id("ankomststedInput"));
+            ankomststed.Clear();
+            IWebElement departureTime = driver.FindElement(By.Id("departureTime"));
+            departureTime.Clear();
+            IWebElement calculateButton = driver.FindElement(By.Id("hastighedBtn"));
+
+            IWebElement username = driver.FindElement(By.Id("brugernavn"));
+            username.Clear();
+            IWebElement addBtn = driver.FindElement(By.Id("addBtn"));
+            IWebElement username2 = driver.FindElement(By.Id("brugernavn2"));
+            username2.Clear();
+            IWebElement searchBtn = driver.FindElement(By.Id("searchBtn"));
+
+            afgangssted.Click();
+            afgangssted.SendKeys("Zealand (Maglegårdsvej)");
+            Thread.Sleep(1000);
+            ankomststed.Click();
+            ankomststed.SendKeys("Roskilde St.");
+            Thread.Sleep(1000);
+
+            departureTime.Click();
+            departureTime.SendKeys(DateTime.Now.AddHours(3).ToString("dd/MM/yyyy"));
+            departureTime.SendKeys(Keys.Tab);
+            departureTime.SendKeys(DateTime.Now.AddHours(3).Hour.ToString());
+            departureTime.SendKeys(DateTime.Now.AddHours(3).Minute.ToString());
+
+            calculateButton.Click();
+            Thread.Sleep(2000);
+
+            username.Click();
+            username.SendKeys("test");
+            Thread.Sleep(1000);
+
+            addBtn.Click();
+            Thread.Sleep(2000);
+
+            username2.Click();
+            username2.SendKeys("test");
+            Thread.Sleep(1000);
+
+            searchBtn.Click();
+            Thread.Sleep(2000);
+
+            IWebElement getAllResult = driver.FindElement(By.Id("getAllResult"));
+            Thread.Sleep(5000);
+
+            Assert.IsTrue(getAllResult.Text.Contains("Roskilde St."));
+        }
+
+        [TestMethod]
+        public void TestSammenlignHastigheder()
+        {
+            IWebElement afgangsstedInput = driver.FindElement(By.Id("afgangsstedInput"));
+            afgangsstedInput.Clear();
+
+            IWebElement ankomststedInput = driver.FindElement(By.Id("ankomststedInput"));
+            ankomststedInput.Clear();
+
+            IWebElement departureTime = driver.FindElement(By.Id("departureTime"));
+            departureTime.Clear();
+
+            IWebElement calculateButton = driver.FindElement(By.Id("hastighedBtn"));
+
+            afgangsstedInput.Click();
+            afgangsstedInput.SendKeys("Roskilde St.");
+            Thread.Sleep(2000);
+            ankomststedInput.Click();
+            ankomststedInput.SendKeys("Zealand (Maglegårdsvej)");
+            Thread.Sleep(2000);
+
+            departureTime.Click();
+            departureTime.SendKeys(DateTime.Now.AddHours(3).ToString("dd/MM/yyyy"));
+            departureTime.SendKeys(Keys.Tab);
+            departureTime.SendKeys(DateTime.Now.AddHours(3).Hour.ToString());
+            departureTime.SendKeys(DateTime.Now.AddHours(3).Minute.ToString());
+
+            calculateButton.Click();
+            Thread.Sleep(2000);
+
+            IWebElement idealSpeed = driver.FindElement(By.Id("idealSpeed"));
+
+            Assert.AreEqual("Du går for hurtigt!", idealSpeed.Text);
+        }
+
         [TestCleanup]
         public void TestTearDown()
         {
