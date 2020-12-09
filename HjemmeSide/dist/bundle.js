@@ -10624,8 +10624,26 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1__);
 
 
-_node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded';
-_node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+//axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded';
+//axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+let baseUrl = 'https://rejseplanenapi20201207103315.azurewebsites.net/api/libraries/';
+let baseUrlTrip = 'https://rejseplanenapi20201207103315.azurewebsites.net/api/Trip/';
+let openWeatherBaseUrl = "https://api.openweathermap.org/data/2.5/weather?";
+let openWeatherLat = "lat=";
+let openWeatherLong = "&lon=";
+let openWeatherApiKey = "&appid=412be2f2e33e80c87ba34e35ac054489";
+let rejseplanenbaseurl = "http://xmlopen.rejseplanen.dk/bin/rest.exe";
+let format = "&format=json";
+var dms = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
+var utm = "+proj=utm +zone=32N +etrs=1989";
+var wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
+class Location {
+    constructor(Name, Coord, Distance) {
+        this.name = Name;
+        this.coord = Coord;
+        this.distance = Distance;
+    }
+}
 Vue.component('v-select', VueSelect.VueSelect);
 Vue.component('library', {
     props: ['library'],
@@ -10648,24 +10666,6 @@ Vue.component('library', {
         </div>
     `
 });
-let baseUrl = 'http://localhost:49606/api/Libraries';
-let baseUrlTrip = 'http://localhost:49606/api/Trip';
-let openWeatherBaseUrl = "https://api.openweathermap.org/data/2.5/weather?";
-let openWeatherLat = "lat=";
-let openWeatherLong = "&lon=";
-let openWeatherApiKey = "&appid=412be2f2e33e80c87ba34e35ac054489";
-let rejseplanenbaseurl = "http://xmlopen.rejseplanen.dk/bin/rest.exe";
-let format = "&format=json";
-var dms = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
-var utm = "+proj=utm +zone=32N +etrs=1989";
-var wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
-class Location {
-    constructor(Name, Coord, Distance) {
-        this.name = Name;
-        this.coord = Coord;
-        this.distance = Distance;
-    }
-}
 var main = new Vue({
     // TypeScript compiler complains about Vue because the CDN link to Vue is in the html file.
     // Before the application runs this TypeScript file will be compiled into bundle.js
@@ -10696,8 +10696,22 @@ var main = new Vue({
         weather_type: "",
         current_city: "",
         current_dateTime: "",
+        dest_temperature: 0,
+        dest_feels_like: 0,
+        dest_wind_speed: 0,
+        dest_wind_degree: 0,
+        dest_humidity: 0,
+        dest_pressure: 0,
+        dest_weather_type: "Choose a station first",
+        dest_current_city: "City",
+        dest_current_dateTime: "Date",
         styleObject: {
             background: '#800000',
+            color: 'white',
+            fontSize: '14px',
+        },
+        styleObject2: {
+            background: '#336eff',
             color: 'white',
             fontSize: '14px',
         },
@@ -10708,13 +10722,51 @@ var main = new Vue({
         userNameToGetBy: "",
         removeTripId: null,
         removeTripStatus: "",
-        addTripStatus: ""
+        addTripStatus: "",
+        current_average_speed: 0,
+        start_time: Date(),
+        moving: true,
+        idealSpeed: ""
     },
     created: function () {
-        // `this` points to the vm instance
-        //this.getLocation()
+        this.interval = setInterval(() => this.updateSpeedAsync(), 1000);
     },
     methods: {
+        //updates the current speed of the master user
+        async updateSpeedAsync() {
+            let totalMeasurements;
+            try {
+                totalMeasurements = await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.get(baseUrl + "/brugernavn/" + "henrik").then(response => { return response.data; }); //moq username / master user
+            }
+            catch (error) {
+            }
+            let start_time;
+            //sletter measurements før start
+            for (let index = 0; index < totalMeasurements.length; index++) {
+                if (totalMeasurements[index].timestamp < start_time) {
+                    totalMeasurements = totalMeasurements.filter(obj => obj !== totalMeasurements[index]);
+                    index--;
+                }
+            }
+            //Regner total hastighed ud og dividere for at finde gennemsnittet
+            let summedSpeed = 0;
+            for (let index = 0; index < totalMeasurements.length; index++) {
+                summedSpeed += totalMeasurements[index].hastighed;
+            }
+            this.current_average_speed = Math.floor(summedSpeed / totalMeasurements.length * 100) / 100;
+            if (this.current_average_speed < this.hastighed) {
+                this.idealSpeed = "Du går for langsomt!";
+            }
+            else if (this.current_average_speed <= this.hastighed + 1) {
+                this.idealSpeed = "Du går tilpas hurtigt";
+            }
+            else if (this.current_average_speed > this.hastighed + 1) {
+                this.idealSpeed = "Du går for hurtigt!";
+            }
+            else {
+                this.idealSpeed = "";
+            }
+        },
         //GET Trips by UserName
         async getByUserNameAsync(userName) {
             try {
@@ -10784,6 +10836,12 @@ var main = new Vue({
             }
         },
         getHastighed() {
+            try {
+                _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.delete(baseUrl + "/brugernavn/" + "henrik"); //moq username / master user
+            }
+            catch (error) {
+            }
+            this.start_time = Date();
             if (this.afgang == "") {
                 this.getDistanceFromLocation();
             }
@@ -10920,6 +10978,7 @@ var main = new Vue({
                 this.selected_ankomst = this.ankomst_stoppested.find((i) => i.name === this.ankomst);
                 var ankomst_Dms = this.fromWgsToDms(Number(this.selected_ankomst.y / 1000000), Number(this.selected_ankomst.x / 1000000));
                 this.distance = Math.round(this.calculateDistance(latitude, longitude, ankomst_Dms[0], ankomst_Dms[1]));
+                this.getDestWeather(this.selected_ankomst);
             });
         },
         async getWeatherFromLatLong() {
@@ -10950,6 +11009,35 @@ var main = new Vue({
                     this.weather_type = response.data.weather[0].main;
                     this.current_dateTime = `${dateTime.toLocaleString('en-us', { weekday: 'long' })} ${hours + ":" + minutes}`;
                 });
+            });
+        },
+        async getDestWeather(destination) {
+            let coords = this.fromWgsToDms(Number(destination.y / 1000000), Number(destination.x / 1000000));
+            let lat = coords[0];
+            let lng = coords[1];
+            let path = openWeatherBaseUrl + openWeatherLat + lat + openWeatherLong + lng + openWeatherApiKey;
+            let dateTime = new Date();
+            let hours = dateTime.getHours().toString();
+            let minutes = dateTime.getMinutes().toString();
+            if (hours.length == 1) {
+                hours = "0" + hours;
+            }
+            if (minutes.length == 1) {
+                minutes = "0" + minutes;
+            }
+            await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a
+                .get(path)
+                .then(response => {
+                let weatherData = response.data.main;
+                this.dest_current_city = response.data.name;
+                this.dest_temperature = (weatherData.temp - 273).toFixed(2);
+                this.dest_feels_like = (weatherData.feels_like - 273).toFixed(2);
+                this.dest_humidity = weatherData.humidity;
+                this.dest_pressure = weatherData.pressure;
+                this.dest_wind_speed = response.data.wind.speed;
+                this.dest_wind_degree = response.data.wind.deg;
+                this.dest_weather_type = response.data.weather[0].main;
+                this.dest_current_dateTime = `${dateTime.toLocaleString('en-us', { weekday: 'long' })} ${hours + ":" + minutes}`;
             });
         }
     }

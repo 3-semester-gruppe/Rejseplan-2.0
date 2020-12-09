@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "mssql1": {
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/rejseplanenapidbserver/databases/RejseplanenAPI_db",
+      "type": "mssql.azure",
+      "connectionId": "peinisisgud4u",
+      "secretStore": "AzureAppSettings"
+    }
+  }
+}

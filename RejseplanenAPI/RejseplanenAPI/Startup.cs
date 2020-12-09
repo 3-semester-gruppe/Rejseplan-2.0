@@ -27,10 +27,10 @@ namespace RejseplanenAPI
         public void ConfigureServices(IServiceCollection services)
         {
             //InMemory database til Sensor
-            services.AddDbContext<RejseplanenContext>(opt => opt.UseInMemoryDatabase("RejseplanenList"));
+            services.AddDbContext<RejseplanenContext>(opt => opt.UseInMemoryDatabase("RejseplanenContext"));
 
             //InMemory database til Trip
-            services.AddDbContext<TripContext>(opt => opt.UseInMemoryDatabase("TripList"));
+            services.AddDbContext<TripContext>(opt => opt.UseInMemoryDatabase("TripContext"));
 
             //MiddleWare with policies
             services.AddCors(options =>

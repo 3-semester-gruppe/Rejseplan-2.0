@@ -19,16 +19,15 @@
 <style>
 #banner1 {
   background-image: url("https://3.bp.blogspot.com/-fH6gZXFHMZ8/Vw-Q9HMY2bI/AAAAAAAApak/VIAISlLlHlQCHjlQUu4Of2HDpMjgtVdTgCHM/s1600/world-travel-wallpaper-the-wallpaper-background.jpg");
-  border-radius: 0px;
 }
 .jumbotron {
-  padding-top: 10px !important;
-  padding-bottom: 10px !important;
+  padding-top: 5px;
+  padding-bottom: 0px;
+  margin-top: 5px;
 }
-.weather {
-  border-radius: 5px;
+.jumbotron, h2 {
+  font-weight: bold;
 }
-
 </style>
 <body>
   <div id="app" class="container">
@@ -75,7 +74,7 @@
     </div> -->
     
     <div id="banner1" class="jumbotron text-center">
-      <h1>Rejseplanen 2.0</h1>
+      <h2>Rejseplanen 2.0</h2>
       <p>Din virtuelle assistent når du skal på farten</p> 
       <div class="weatherInBanner">
 
@@ -282,8 +281,15 @@
           <p>På ca.:</p>
           <b><p id="timeRemaining">{{ timeRemaining }}<span v-if="timeRemaining"> minutter</span></p></b>
         </div>
+        <div class="col-sm-4">
+          <p>Din nuværende hastighed er:</p>
+          <b><p id="speed">{{ current_average_speed }}<span v-if="current_average_speed"> km/t</span></p></b>
+          <div :style="styleObject2">
+          <p id="idealSpeed">{{ idealSpeed }}</p>
+        </div>
       </div>
     </div>
+  </div>
 
     <div class="container-md">
       <div class="row">
