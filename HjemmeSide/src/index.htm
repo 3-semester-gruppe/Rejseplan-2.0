@@ -235,7 +235,7 @@
     <div class="container-md well">
       <div class="row">
         <div class="col-sm-4">
-          <input id="afgangsstedInput" v-model="afgang" placeholder="Afgangssted" @keyup="getAfgangTimeOut()" list="afgang_stoppested">
+          <input id="afgangsstedInput" v-model="afgang" placeholder="Your Location" @keyup="getAfgangTimeOut()" list="afgang_stoppested">
           <datalist id="afgang_stoppested">
             <option id="afgangsstedName" v-for="stoppested in afgang_stoppested">
               {{stoppested.name}}
@@ -326,7 +326,8 @@
             <div v-if="trips.length">
                <div id="getAllResult" class="list-group-item" v-for="trip in trips">
                   ID: {{trip.id}} | Brugernavn: {{trip.userName}} | Afgangssted: {{trip.startDestination}} | Ankomststed: {{trip.endDestination}} | Afgangstidspunkt: {{trip.departureTime}} | Dit afgangstidspunkt: {{trip.userDepartureTime}} | Gennemsnitshastighed: {{trip.averageSpeed }} <span v-if="hastighed"> km/t</span> | Distance: {{trip.distanceToWalk}} <span v-if="distance"> meter</span> | Tid: {{trip.timeToWalk}} <span v-if="timeRemaining"> minutter</span>
-               </div>
+                  <button class="notification" id="notification" @click="alertNotification(trip)">Show alert</button>
+                </div>
               </div>
             <div class="well" v-else>Du har ingen gemte rejser</div>
         </div>
