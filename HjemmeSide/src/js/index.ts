@@ -23,6 +23,8 @@ var dms = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
 var utm = "+proj=utm +zone=32N +etrs=1989";
 var wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
 
+var alarm_loop: number;
+
 class Location{
     name: string;
     coord: Array<number>
@@ -143,7 +145,12 @@ var main = new Vue({
         current_average_speed: 0,
         start_time: Date(),
         moving: true,
-        idealSpeed: ""
+        idealSpeed: "",
+        alarm_hours: null,
+        alarm_minutes: null,
+        alarm_time: null,
+        alarm_ring: false,
+        alarm_set: false
     },
     created: function () {
       this.interval = setInterval(() => this.updateSpeedAsync(), 1000);
@@ -324,7 +331,6 @@ var main = new Vue({
             this.locationArray.push(newLocation)
           });
         })
-        console.log(this.locationArray)
       },
       async asyncGetAfgang() {
         let path: string = `http://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.afgang}&${format}`;
@@ -336,12 +342,10 @@ var main = new Vue({
       },
       async getAfgang() {
         let response  = await this.asyncGetAfgang();
-        console.log(response.data.LocationList.StopLocation);
         this.afgang_stoppested = response.data.LocationList.StopLocation;
       },
       async getAnkomst() {
         let response  = await this.asyncGetAnkomst();
-        console.log(response.data.LocationList.StopLocation)
         this.ankomst_stoppested = response.data.LocationList.StopLocation;
       },
       fromDmsToWgs(x:number, y:number) {
@@ -385,7 +389,6 @@ var main = new Vue({
       },
       getDistanceFromLocation() {
         navigator.geolocation.getCurrentPosition(position => {  
-          console.log(position.coords.longitude, position.coords.latitude); 
           var longitude = position.coords.longitude;
           var latitude = position.coords.latitude;
           this.selected_ankomst = this.ankomst_stoppested.find ( (i: any) => i.name === this.ankomst); 
@@ -411,7 +414,6 @@ var main = new Vue({
           await axios
           .get(path)
           .then(response => {
-            console.log(response.data);
             weatherData = response.data.main;
             this.current_city = response.data.name;
             this.temperature = (weatherData.temp - 273).toFixed(2);
@@ -423,21 +425,19 @@ var main = new Vue({
             this.weather_type = response.data.weather[0].main;
             this.current_dateTime = `${dateTime.toLocaleString('en-us', {  weekday: 'long' })} ${hours + ":" + minutes}`;
           })
-
-        },
+        }
+      },
       AddMinutesToDate(date:any, minutes:any) {
           return new Date(date.getTime() + minutes*60000);
       },
       alertNotification(trip:ITrip){
         if(this.trips != null && this.trips.length > 0){
-          console.log(this.trips);
           let oldTime = new Date(trip.userDepartureTime);
           let newTime = new Date(this.AddMinutesToDate(oldTime, 5));
           let message1 = `${trip.startDestination} - ${trip.endDestination} \nDu skulle havde været ved dit stop ${trip.departureTime} \nEt stop på din rejse er forsinket`;
           let message2 = `Din nye afgangstid er: ${newTime.toString()}`
           alert(message1 + "\n" + message2);
         }
-        });
       },
       async getDestWeather(destination:any){
         let coords = this.fromWgsToDms(Number(destination.y / 1000000), Number(destination.x / 1000000));
@@ -467,6 +467,63 @@ var main = new Vue({
           this.dest_weather_type = response.data.weather[0].main;
           this.dest_current_dateTime = `${dateTime.toLocaleString('en-us', {  weekday: 'long' })} ${hours + ":" + minutes}`;
         })
+      },
+      ringAlarm(){
+        var date = new Date();
+        var time_now_hours = date.getHours().toString();
+        var time_now_minutes = date.getMinutes().toString();
+
+        if(time_now_hours.length == 1){
+          time_now_hours = "0" + time_now_hours;
+        }
+        if(time_now_minutes.length == 1){
+          time_now_minutes = "0" + time_now_minutes;
+        }
+        var time_now = time_now_hours + ":" + time_now_minutes;
+
+        if(this.alarm_set == false){
+          if(this.alarm_hours.toString().length > 0 && this.alarm_hours.toString().length <= 2){
+            if(this.alarm_hours.length == 1){
+              this.alarm_hours = "0" + this.alarm_hours;
+            }
+            if(this.alarm_minutes.toString().length > 0 && this.alarm_minutes.toString().length <= 2){
+              if(this.alarm_minutes.length == 1){
+                this.alarm_minutes = "0" + this.alarm_minutes;
+              }
+              this.alarm_time = this.alarm_hours + ":" + this.alarm_minutes;
+  
+              this.alarm_set = true;
+              if(this.alarm_ring == false){
+                this.alarm_ring = true;
+                alert("Alarm set!");
+              }
+            }else{
+              alert("Enter minutes correct");
+            }
+          }else{
+            alert("Enter hours correct");
+          }
+        }
+
+        if(this.alarm_ring == true){
+          if(time_now === this.alarm_time){
+            alert("DING DONG DING DONG")
+            this.alarm_time = "";
+            this.alarm_set = false;
+            this.alarm_ring = false;
+            clearTimeout(alarm_loop);
+          }else{
+            alarm_loop = setTimeout(this.ringAlarm, 1000);
+          }
+        }
+      },
+      cancelAlarm(){
+        this.alarm_set = false;
+        if(this.alarm_ring == true){
+          this.alarm_ring = false;
+        }
+        clearTimeout(alarm_loop);
+        alert("Alarm cancelled!");
       }
     }
 })

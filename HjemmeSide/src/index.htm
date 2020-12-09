@@ -231,6 +231,12 @@
     </div>
   -->
       <p></p>
+    <div class="alarm_clock" id="alarm_clock">
+      <input v-model="alarm_hours" type="number" min="0" max="23" placeholder="Hours">
+      <input v-model="alarm_minutes" type="number" min="0" max="59" placeholder="Minutes">
+      <button @click="ringAlarm()">ring</button>
+      <button @click="cancelAlarm()">cancel</button>
+    </div>
 
     <div class="container-md well">
       <div class="row">
