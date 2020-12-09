@@ -231,17 +231,12 @@
     </div>
   -->
       <p></p>
-    <div class="alarm_clock" id="alarm_clock">
-      <input v-model="alarm_hours" type="number" min="0" max="23" placeholder="Hours">
-      <input v-model="alarm_minutes" type="number" min="0" max="59" placeholder="Minutes">
-      <button @click="ringAlarm()">ring</button>
-      <button @click="cancelAlarm()">cancel</button>
-    </div>
+    
 
     <div class="container-md well">
       <div class="row">
         <div class="col-sm-4">
-          <input id="afgangsstedInput" v-model="afgang" placeholder="Your Location" @keyup="getAfgangTimeOut()" list="afgang_stoppested">
+          <input id="afgangsstedInput" v-model="afgang" placeholder="Din nuværende lokation" @keyup="getAfgangTimeOut()" list="afgang_stoppested">
           <datalist id="afgang_stoppested">
             <option id="afgangsstedName" v-for="stoppested in afgang_stoppested">
               {{stoppested.name}}
@@ -332,10 +327,21 @@
             <div v-if="trips.length">
                <div id="getAllResult" class="list-group-item" v-for="trip in trips">
                   ID: {{trip.id}} | Brugernavn: {{trip.userName}} | Afgangssted: {{trip.startDestination}} | Ankomststed: {{trip.endDestination}} | Afgangstidspunkt: {{trip.departureTime}} | Dit afgangstidspunkt: {{trip.userDepartureTime}} | Gennemsnitshastighed: {{trip.averageSpeed }} <span v-if="hastighed"> km/t</span> | Distance: {{trip.distanceToWalk}} <span v-if="distance"> meter</span> | Tid: {{trip.timeToWalk}} <span v-if="timeRemaining"> minutter</span>
-                  <button class="notification" id="notification" @click="alertNotification(trip)">Show alert</button>
+                  <p></p>
+                  <button class="notification" id="notification" @click="alertNotification(trip)">Vis notifikation</button>
                 </div>
               </div>
             <div class="well" v-else>Du har ingen gemte rejser</div>
+        </div>
+        <div class="col-sm-4">
+          <h3>Sæt en alarm</h3>
+          <p>Angiv et alarmtidspunkt og få en notifikation, så du kan blive vækket og komme afsted til tiden:</p>
+          <div class="alarm_clock" id="alarm_clock">
+      		<input v-model="alarm_hours" type="number" min="0" max="23" placeholder="Timer">
+      		<input v-model="alarm_minutes" type="number" min="0" max="59" placeholder="Minutter">
+      		<button class="btn-success" @click="ringAlarm()">Sæt alarm</button>
+      		<button class="btn-danger" @click="cancelAlarm()">Slå alarm fra</button>
+    		</div>
         </div>
       </div>
     </div>
