@@ -10622,22 +10622,28 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var proj4__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! proj4 */ "./node_modules/proj4/lib/index.js");
 /* harmony import */ var _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../node_modules/axios/index */ "./node_modules/axios/index.js");
 /* harmony import */ var _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1__);
+//Koordinat support
 
 
-//axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded';
-//axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+//url til hastigheds målinger
 let baseUrl = 'https://rejseplanenapi20201207103315.azurewebsites.net/api/libraries/';
+//url til gemte rejser
 let baseUrlTrip = 'https://rejseplanenapi20201207103315.azurewebsites.net/api/Trip/';
+//url support til vejr api
 let openWeatherBaseUrl = "https://api.openweathermap.org/data/2.5/weather?";
 let openWeatherLat = "lat=";
 let openWeatherLong = "&lon=";
 let openWeatherApiKey = "&appid=412be2f2e33e80c87ba34e35ac054489";
+//url support til rejseplanens api
 let rejseplanenbaseurl = "http://xmlopen.rejseplanen.dk/bin/rest.exe";
 let format = "&format=json";
+//formater til rejseplanens api
 var dms = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
 var utm = "+proj=utm +zone=32N +etrs=1989";
 var wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
+//variabel til alarmen
 var alarm_loop;
+//class til brug af rejseplanens api
 class Location {
     constructor(Name, Coord, Distance) {
         this.name = Name;
@@ -10645,37 +10651,44 @@ class Location {
         this.distance = Distance;
     }
 }
+//Vue support til dropdown når der søges efter stationer
 Vue.component('v-select', VueSelect.VueSelect);
-Vue.component('library', {
-    props: ['library'],
-    methods: {},
-    template: `
-        <div class="jumbotron library">
-            <h1>{{ library.brugernavn }}</h1>
-            <div class="hastighed-row">
-                <h2 class="library-stat">Hastighed:</h2>
-                <h2 class="library-info">{{ library.hastighed }}</h2>
-            </div>
-            <div class="hastighed-row">
-                <h2 class="library-stat">TimeStamp:</h2>
-                <h2 class="library-info">{{ library.timestamp }}</h2>
-            </div>
-            <div class="hastighed-row">
-                <h2 class="library-stat">Year of publication:</h2>
-                <h2 class="library-info">{{ library.id }}</h2>
-            </div>
-        </div>
-    `
-});
+//Component til visning af hastigheds målinger
+// Vue.component('library', {
+//     props: ['library'],
+//     methods: {
+//     },
+//     template: `
+//         <div class="jumbotron library">
+//             <h1>{{ library.brugernavn }}</h1>
+//             <div class="hastighed-row">
+//                 <h2 class="library-stat">Hastighed:</h2>
+//                 <h2 class="library-info">{{ library.hastighed }}</h2>
+//             </div>
+//             <div class="hastighed-row">
+//                 <h2 class="library-stat">TimeStamp:</h2>
+//                 <h2 class="library-info">{{ library.timestamp }}</h2>
+//             </div>
+//             <div class="hastighed-row">
+//                 <h2 class="library-stat">Year of publication:</h2>
+//                 <h2 class="library-info">{{ library.id }}</h2>
+//             </div>
+//         </div>
+//     `
+// })
+//vue object
 var main = new Vue({
     // TypeScript compiler complains about Vue because the CDN link to Vue is in the html file.
     // Before the application runs this TypeScript file will be compiled into bundle.js
     // which is included at the bottom of the html file.
     el: "#app",
+    //Alt dataen der bruges i sammenhæng med vue
     data: {
-        librarys: [],
-        locationArray: [],
-        search: "",
+        //bruges til visning af hastigheds målinger
+        //librarys: [],
+        // search: "",
+        //bruges i forbindelse med at finde stopsteder i nærheden
+        // locationArray: [],
         afgang: "",
         ankomst: "",
         hastighed: null,
@@ -10732,7 +10745,8 @@ var main = new Vue({
         alarm_minutes: null,
         alarm_time: null,
         alarm_ring: false,
-        alarm_set: false
+        alarm_set: false,
+        active: false
     },
     created: function () {
         this.interval = setInterval(() => this.updateSpeedAsync(), 1000);
@@ -10740,37 +10754,39 @@ var main = new Vue({
     methods: {
         //updates the current speed of the master user
         async updateSpeedAsync() {
-            let totalMeasurements;
-            try {
-                totalMeasurements = await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.get(baseUrl + "/brugernavn/" + "henrik").then(response => { return response.data; }); //moq username / master user
-            }
-            catch (error) {
-            }
-            let start_time;
-            //sletter measurements før start
-            for (let index = 0; index < totalMeasurements.length; index++) {
-                if (totalMeasurements[index].timestamp < start_time) {
-                    totalMeasurements = totalMeasurements.filter(obj => obj !== totalMeasurements[index]);
-                    index--;
+            if (this.active) {
+                let totalMeasurements;
+                try {
+                    totalMeasurements = await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.get(baseUrl + "/brugernavn/" + "henrik").then(response => { return response.data; }); //moq username / master user
                 }
-            }
-            //Regner total hastighed ud og dividere for at finde gennemsnittet
-            let summedSpeed = 0;
-            for (let index = 0; index < totalMeasurements.length; index++) {
-                summedSpeed += totalMeasurements[index].hastighed;
-            }
-            this.current_average_speed = Math.floor(summedSpeed / totalMeasurements.length * 100) / 100;
-            if (this.current_average_speed < this.hastighed) {
-                this.idealSpeed = "Du går for langsomt!";
-            }
-            else if (this.current_average_speed <= this.hastighed + 1) {
-                this.idealSpeed = "Du går tilpas hurtigt";
-            }
-            else if (this.current_average_speed > this.hastighed + 1) {
-                this.idealSpeed = "Du går for hurtigt!";
-            }
-            else {
-                this.idealSpeed = "";
+                catch (error) {
+                }
+                let start_time;
+                //sletter measurements før start
+                for (let index = 0; index < totalMeasurements.length; index++) {
+                    if (totalMeasurements[index].timestamp < start_time) {
+                        totalMeasurements = totalMeasurements.filter(obj => obj !== totalMeasurements[index]);
+                        index--;
+                    }
+                }
+                //Regner total hastighed ud og dividere for at finde gennemsnittet
+                let summedSpeed = 0;
+                for (let index = 0; index < totalMeasurements.length; index++) {
+                    summedSpeed += totalMeasurements[index].hastighed;
+                }
+                this.current_average_speed = Math.floor(summedSpeed / totalMeasurements.length * 100) / 100;
+                if (this.current_average_speed < this.hastighed) {
+                    this.idealSpeed = "Du går for langsomt!";
+                }
+                else if (this.current_average_speed <= this.hastighed + 1) {
+                    this.idealSpeed = "Du går tilpas hurtigt";
+                }
+                else if (this.current_average_speed > this.hastighed + 1) {
+                    this.idealSpeed = "Du går for hurtigt!";
+                }
+                else {
+                    this.idealSpeed = "";
+                }
             }
         },
         //GET Trips by UserName
@@ -10821,27 +10837,28 @@ var main = new Vue({
             let response = await this.deleteTripAsync(url);
             this.removeTripStatus = "Status: " + response.status + " " + response.statusText;
         },
-        async getLibraryAsync() {
-            try {
-                _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.get(baseUrl + "/brugernavn/" + this.search, { headers: { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS", "Access-Control-Allow-Credentials": "true" } }).then().catch(error => this.librarys = [])
-                    .then(result => { this.librarys = result.data; })
-                    .catch(error => { return []; });
-            }
-            catch (error) {
-                this.message = error.message;
-                alert(error.message);
-            }
-        },
-        async deleteLibraryAsync() {
-            try {
-                _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.delete(baseUrl + "/brugernavn/" + this.search, { headers: { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS", "Access-Control-Allow-Credentials": "true" } }).then(error => this.librarys = []).catch(error => this.librarys = []);
-            }
-            catch (error) {
-                this.message = error.message;
-                alert(error.message);
-            }
-        },
+        // async getLibraryAsync(){
+        //     try {
+        //         axios.get<ILibrary[]>(baseUrl + "/brugernavn/" + this.search, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } ).then().catch(error => this.librarys = [])
+        //         .then(result => {this.librarys = result.data;})
+        //         .catch(error => {return []});
+        //     }
+        //     catch ( error: AxiosError){
+        //         this.message = error.message;
+        //         alert(error.message);
+        //     }
+        // },
+        // async deleteLibraryAsync(){
+        //     try {
+        //         axios.delete(baseUrl + "/brugernavn/" + this.search, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } ).then(error => this.librarys = []).catch(error => this.librarys = [])
+        //     }
+        //     catch ( error: AxiosError){
+        //         this.message = error.message;
+        //         alert(error.message);
+        //     }
+        // },
         getHastighed() {
+            this.active = true;
             try {
                 _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.delete(baseUrl + "/brugernavn/" + "henrik"); //moq username / master user
             }
@@ -10898,33 +10915,31 @@ var main = new Vue({
                 this.getAnkomst();
             }, 500);
         },
-        getNearbyStops(x, y) {
-            let path = rejseplanenbaseurl + `/stopsNearby?coordX=${x}&coordY=${y}${format}`;
-            _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a
-                .get(path)
-                .then(response => {
-                let newLocation;
-                response.data.LocationList.StopLocation.forEach((location) => {
-                    newLocation = new Location(location.name, this.fromWgsToDms(Number(location.y / 1000000), Number(location.x / 1000000)), location.distance);
-                    this.locationArray.push(newLocation);
-                });
-            });
-        },
+        // getNearbyStops(x:number, y:number) {
+        //   let path: string = rejseplanenbaseurl + `/stopsNearby?coordX=${x}&coordY=${y}${format}`
+        //   axios
+        //   .get(path)
+        //   .then(response=> {
+        //     let newLocation: Location;
+        //     response.data.LocationList.StopLocation.forEach((location:any) => {
+        //       newLocation = new Location(location.name, this.fromWgsToDms(Number(location.y / 1000000), Number(location.x / 1000000)), location.distance);
+        //       this.locationArray.push(newLocation)
+        //     });
+        //   })
+        // },
         async asyncGetAfgang() {
             let path = `http://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.afgang}&${format}`;
             try {
                 return await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.get(path);
             }
-            finally {
-            }
+            catch (_a) { }
         },
         async asyncGetAnkomst() {
             let path = `http://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.ankomst}&${format}`;
             try {
                 return await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.get(path);
             }
-            finally {
-            }
+            catch (_a) { }
         },
         async getAfgang() {
             let response = await this.asyncGetAfgang();

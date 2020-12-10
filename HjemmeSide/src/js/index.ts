@@ -1,30 +1,37 @@
+//Koordinat support
 import coord from "proj4";
-import Axios from "../../node_modules/axios/index";
 
+//https request support
+import Axios from "../../node_modules/axios/index";
 import axios, {
     AxiosResponse,
     AxiosError
 } from "../../node_modules/axios/index"
-//axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded';
-//axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 
+//url til hastigheds målinger
 let baseUrl = 'https://rejseplanenapi20201207103315.azurewebsites.net/api/libraries/';
+//url til gemte rejser
 let baseUrlTrip = 'https://rejseplanenapi20201207103315.azurewebsites.net/api/Trip/';
 
+//url support til vejr api
 let openWeatherBaseUrl = "https://api.openweathermap.org/data/2.5/weather?"
 let openWeatherLat = "lat="
 let openWeatherLong = "&lon="
 let openWeatherApiKey = "&appid=412be2f2e33e80c87ba34e35ac054489"
 
+//url support til rejseplanens api
 let rejseplanenbaseurl: string = "http://xmlopen.rejseplanen.dk/bin/rest.exe";
 let format: string = "&format=json";
 
+//formater til rejseplanens api
 var dms = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
 var utm = "+proj=utm +zone=32N +etrs=1989";
 var wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
 
+//variabel til alarmen
 var alarm_loop: number;
 
+//class til brug af rejseplanens api
 class Location{
     name: string;
     coord: Array<number>
@@ -37,6 +44,7 @@ class Location{
     }
 }
 
+//class til formatering af json og data håndtering i forbindelse af rejser
 interface ITrip {
   "id": number,
   "userName": string,
@@ -49,51 +57,61 @@ interface ITrip {
   "timeToWalk": number
 }
 
+//class til formatering af json og data håndtering i forbindelse af hastigheds målinger
 interface ILibrary {
     "brugernavn": string,
     "hastighed": number,
     "timestamp": Date,
     "id": number
 }
+
+//class til formatering og data håndtering i forbindelse af stoppesteder fra rejseplanen
 interface IStoppested {
   name: string,
   x: string,
 }
 
+//Vue support til dropdown når der søges efter stationer
 Vue.component('v-select', VueSelect.VueSelect)
 
-Vue.component('library', {
-    props: ['library'],
-    methods: {
-    },
-    template: `
-        <div class="jumbotron library">
-            <h1>{{ library.brugernavn }}</h1>
-            <div class="hastighed-row">
-                <h2 class="library-stat">Hastighed:</h2>
-                <h2 class="library-info">{{ library.hastighed }}</h2>
-            </div>
-            <div class="hastighed-row">
-                <h2 class="library-stat">TimeStamp:</h2>
-                <h2 class="library-info">{{ library.timestamp }}</h2>
-            </div>
-            <div class="hastighed-row">
-                <h2 class="library-stat">Year of publication:</h2>
-                <h2 class="library-info">{{ library.id }}</h2>
-            </div>
-        </div>
-    `
-})
+//Component til visning af hastigheds målinger
+// Vue.component('library', {
+//     props: ['library'],
+//     methods: {
+//     },
+//     template: `
+//         <div class="jumbotron library">
+//             <h1>{{ library.brugernavn }}</h1>
+//             <div class="hastighed-row">
+//                 <h2 class="library-stat">Hastighed:</h2>
+//                 <h2 class="library-info">{{ library.hastighed }}</h2>
+//             </div>
+//             <div class="hastighed-row">
+//                 <h2 class="library-stat">TimeStamp:</h2>
+//                 <h2 class="library-info">{{ library.timestamp }}</h2>
+//             </div>
+//             <div class="hastighed-row">
+//                 <h2 class="library-stat">Year of publication:</h2>
+//                 <h2 class="library-info">{{ library.id }}</h2>
+//             </div>
+//         </div>
+//     `
+// })
 
+//vue object
 var main = new Vue({
     // TypeScript compiler complains about Vue because the CDN link to Vue is in the html file.
     // Before the application runs this TypeScript file will be compiled into bundle.js
     // which is included at the bottom of the html file.
     el: "#app",
+
+    //Alt dataen der bruges i sammenhæng med vue
     data: {
-        librarys: [],
-        locationArray: [],
-        search: "",
+      //bruges til visning af hastigheds målinger
+        //librarys: [],
+        // search: "",
+      //bruges i forbindelse med at finde stopsteder i nærheden
+        // locationArray: [],
         afgang: "",
         ankomst: "",
         hastighed: null,
@@ -150,7 +168,8 @@ var main = new Vue({
         alarm_minutes: null,
         alarm_time: null,
         alarm_ring: false,
-        alarm_set: false
+        alarm_set: false,
+        active: false
     },
     created: function () {
       this.interval = setInterval(() => this.updateSpeedAsync(), 1000);
@@ -158,39 +177,41 @@ var main = new Vue({
     methods: {
       //updates the current speed of the master user
       async updateSpeedAsync(){
-        let totalMeasurements : ILibrary[];
-        try {
-          totalMeasurements = await axios.get<ILibrary[]>(baseUrl + "/brugernavn/" + "henrik").then(response => {return response.data}); //moq username / master user
-        }
-        catch (error: AxiosError) {
-        }
-        let start_time : Date;
-        //sletter measurements før start
-        for (let index = 0; index < totalMeasurements.length; index++) {
-          if(totalMeasurements[index].timestamp < start_time){
-            totalMeasurements = totalMeasurements.filter(obj => obj !== totalMeasurements[index]);
-            index--;
+        if (this.active){
+          let totalMeasurements : ILibrary[];
+          try {
+            totalMeasurements = await axios.get<ILibrary[]>(baseUrl + "/brugernavn/" + "henrik").then(response => {return response.data}); //moq username / master user
           }
-        }
+          catch (error: AxiosError) {
+          }
+          let start_time : Date;
+          //sletter measurements før start
+          for (let index = 0; index < totalMeasurements.length; index++) {
+            if(totalMeasurements[index].timestamp < start_time){
+              totalMeasurements = totalMeasurements.filter(obj => obj !== totalMeasurements[index]);
+              index--;
+            }
+          }
 
-        //Regner total hastighed ud og dividere for at finde gennemsnittet
-        let summedSpeed : number = 0
-        for (let index = 0; index < totalMeasurements.length; index++) {
-          summedSpeed += totalMeasurements[index].hastighed
-        }
-        this.current_average_speed = Math.floor(summedSpeed / totalMeasurements.length * 100) / 100;
+          //Regner total hastighed ud og dividere for at finde gennemsnittet
+          let summedSpeed : number = 0
+          for (let index = 0; index < totalMeasurements.length; index++) {
+            summedSpeed += totalMeasurements[index].hastighed
+          }
+          this.current_average_speed = Math.floor(summedSpeed / totalMeasurements.length * 100) / 100;
 
-        if (this.current_average_speed < this.hastighed) {
-          this.idealSpeed = "Du går for langsomt!";
-        }
-        else if (this.current_average_speed <= this.hastighed+1) {
-          this.idealSpeed = "Du går tilpas hurtigt";
-        }
-        else if(this.current_average_speed > this.hastighed+1){
-          this.idealSpeed = "Du går for hurtigt!";
-        }
-        else {
-          this.idealSpeed = "";
+          if (this.current_average_speed < this.hastighed) {
+            this.idealSpeed = "Du går for langsomt!";
+          }
+          else if (this.current_average_speed <= this.hastighed+1) {
+            this.idealSpeed = "Du går tilpas hurtigt";
+          }
+          else if(this.current_average_speed > this.hastighed+1){
+            this.idealSpeed = "Du går for hurtigt!";
+          }
+          else {
+            this.idealSpeed = "";
+          }
         }
       },
       //GET Trips by UserName
@@ -241,27 +262,28 @@ var main = new Vue({
         let response = await this.deleteTripAsync(url);
         this.removeTripStatus = "Status: " + response.status + " " + response.statusText;
       },
-      async getLibraryAsync(){
-          try {
-              axios.get<ILibrary[]>(baseUrl + "/brugernavn/" + this.search, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } ).then().catch(error => this.librarys = [])
-              .then(result => {this.librarys = result.data;})
-              .catch(error => {return []});
-          }
-          catch ( error: AxiosError){
-              this.message = error.message;
-              alert(error.message);
-          }
-      },
-      async deleteLibraryAsync(){
-          try {
-              axios.delete(baseUrl + "/brugernavn/" + this.search, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } ).then(error => this.librarys = []).catch(error => this.librarys = [])
-          }
-          catch ( error: AxiosError){
-              this.message = error.message;
-              alert(error.message);
-          }
-      },
+      // async getLibraryAsync(){
+      //     try {
+      //         axios.get<ILibrary[]>(baseUrl + "/brugernavn/" + this.search, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } ).then().catch(error => this.librarys = [])
+      //         .then(result => {this.librarys = result.data;})
+      //         .catch(error => {return []});
+      //     }
+      //     catch ( error: AxiosError){
+      //         this.message = error.message;
+      //         alert(error.message);
+      //     }
+      // },
+      // async deleteLibraryAsync(){
+      //     try {
+      //         axios.delete(baseUrl + "/brugernavn/" + this.search, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } ).then(error => this.librarys = []).catch(error => this.librarys = [])
+      //     }
+      //     catch ( error: AxiosError){
+      //         this.message = error.message;
+      //         alert(error.message);
+      //     }
+      // },
       getHastighed(){
+        this.active = true;
         try {
           axios.delete(baseUrl + "/brugernavn/" + "henrik"); //moq username / master user
         }
@@ -320,25 +342,25 @@ var main = new Vue({
             this.getAnkomst();
         }, 500);
       },        
-      getNearbyStops(x:number, y:number) {
-        let path: string = rejseplanenbaseurl + `/stopsNearby?coordX=${x}&coordY=${y}${format}`
-        axios
-        .get(path)
-        .then(response=> {
-          let newLocation: Location;
-          response.data.LocationList.StopLocation.forEach((location:any) => {
-            newLocation = new Location(location.name, this.fromWgsToDms(Number(location.y / 1000000), Number(location.x / 1000000)), location.distance);
-            this.locationArray.push(newLocation)
-          });
-        })
-      },
+      // getNearbyStops(x:number, y:number) {
+      //   let path: string = rejseplanenbaseurl + `/stopsNearby?coordX=${x}&coordY=${y}${format}`
+      //   axios
+      //   .get(path)
+      //   .then(response=> {
+      //     let newLocation: Location;
+      //     response.data.LocationList.StopLocation.forEach((location:any) => {
+      //       newLocation = new Location(location.name, this.fromWgsToDms(Number(location.y / 1000000), Number(location.x / 1000000)), location.distance);
+      //       this.locationArray.push(newLocation)
+      //     });
+      //   })
+      // },
       async asyncGetAfgang() {
         let path: string = `http://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.afgang}&${format}`;
-        try {return await axios.get<IStoppested[]>(path) }
+        try {return await axios.get<IStoppested[]>(path) } catch {}
       },
       async asyncGetAnkomst() {
         let path: string = `http://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.ankomst}&${format}`;
-        try {return await axios.get<IStoppested[]>(path) }
+        try {return await axios.get<IStoppested[]>(path) } catch {}
       },
       async getAfgang() {
         let response  = await this.asyncGetAfgang();
