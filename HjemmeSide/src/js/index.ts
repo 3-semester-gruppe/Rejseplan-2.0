@@ -196,9 +196,12 @@ var main = new Vue({
       
       //hvor langt tid man har til at gå den givne hastighed
         timeRemaining: null,
+      //bliver skrevet i når man går for hurtigt
         maksHastighed: "",
+      
+      //viser ens gemte rejser
         trips: [],
-        formData: { userName: "", startDestination: "", endDestination: "", departureTime: null, userDepartureTime: null, averageSpeed: null, distanceToWalk: null, timeToWalk: null},
+        userName: "",
         userNameToGetBy: "",
         removeTripId: null,
         removeTripStatus: "",
@@ -226,6 +229,9 @@ var main = new Vue({
             totalMeasurements = await axios.get<ILibrary[]>(baseUrl + "/brugernavn/" + "henrik").then(response => {return response.data}); //moq username / master user
           }
           catch (error: AxiosError) {
+          }
+          if(totalMeasurements == undefined){
+            return;
           }
           let start_time : Date;
           //sletter measurements før start
@@ -273,17 +279,19 @@ var main = new Vue({
       //POST Trip
       async addTripAsync() {
         try {
-          this.formData.startDestination = this.afgang;
-          this.formData.endDestination = this.ankomst;
-          this.formData.departureTime = this.departureTime;
-          this.formData.userDepartureTime = this.userDepartureTime;
-          this.formData.averageSpeed = this.hastighed;
-          this.formData.distanceToWalk = this.distance;
-          this.formData.timeToWalk = this.timeRemaining;
-          return await axios.post<ITrip>(baseUrlTrip, this.formData);
+          let postData : ITrip = {} as ITrip;
+          postData.startDestination = this.afgang;
+          postData.endDestination = this.ankomst;
+          postData.departureTime = this.departureTime;
+          postData.userDepartureTime = this.userDepartureTime;
+          postData.averageSpeed = this.hastighed;
+          postData.distanceToWalk = this.distance;
+          postData.timeToWalk = this.timeRemaining;
+          postData.userName = this.userName;
+          return await axios.post<ITrip>(baseUrlTrip, postData);
         }
         catch (error: AxiosError) {
-          this.addTripStatus = error.message;
+          console.log(error.message);
           this.addTripStatus = "Rejsen blev ikke gemt!"
         }
       },
