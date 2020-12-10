@@ -49,14 +49,28 @@ namespace LibraryUnitTest
         public void HastighedBoundaryValuesTest()
         {
             _library.Hastighed = 0;
-            Assert.AreEqual(0, _library.Hastighed);
+            Assert.AreEqual(0, _library.Hastighed, 0.0001);
 
             _library.Hastighed = 1;
-            Assert.AreEqual(1, _library.Hastighed);
+            Assert.AreEqual(1, _library.Hastighed, 0.0001);
+
+            _library.Hastighed = 0.1;
+            Assert.AreEqual(0.1, _library.Hastighed, 0.0001);
 
             try
             {
                 _library.Hastighed = -1;
+                Assert.Fail();
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                Assert.AreEqual("Hastighed må ikke være negativt (Parameter 'Hastighed')",
+                    ex.Message);
+            }
+
+            try
+            {
+                _library.Hastighed = -0.1;
                 Assert.Fail();
             }
             catch (ArgumentOutOfRangeException ex)
