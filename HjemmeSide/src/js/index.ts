@@ -126,9 +126,10 @@ var main = new Vue({
         distance: null,
       //tidspunktet brugeren trykkede udregn
         userDepartureTime: null,
-
+        userDepartureTimeDisplay: null,
+      
       //længdegrad for hvor man er
-        longitude: null,
+      longitude: null,
       //breddegrad for hvor man er
         latitude: null,
 
@@ -354,7 +355,9 @@ var main = new Vue({
             this.maksHastighed = "";
           }
           let whenToLeaveDate : Date = new Date(this.whenToLeave());
+          let whenToLeaveDateFormatted = new Intl.DateTimeFormat('en-GB', { dateStyle: 'full', timeStyle: 'short' }).format(whenToLeaveDate);
           this.userDepartureTime = whenToLeaveDate;
+          this.userDepartureTimeDisplay = whenToLeaveDateFormatted;
           //Tid tilbage i minutter
           let timeSubtract : number = Math.round(((whenToLeaveDate.getTime() - departure.getTime())/1000)/60)/-1;
           this.timeRemaining = timeSubtract;
