@@ -112,46 +112,88 @@ var main = new Vue({
         // search: "",
       //bruges i forbindelse med at finde stopsteder i nærheden
         // locationArray: [],
+
+      //hvor der skal være afgang fra
         afgang: "",
+      //hvor der skal ankommes til
         ankomst: "",
+
+      //den hastighed der skal gås for at man når til stationen
         hastighed: null,
+      //hvornår man skal være på den givne station
         departureTime: null,
+      //distancen man skal gå mellem de to stopsteder
         distance: null,
+      //tidspunktet brugeren trykkede udregn
         userDepartureTime: null,
+
+      //længdegrad for hvor man er
         longitude: null,
+      //breddegrad for hvor man er
         latitude: null,
+
+      //stoppestedder man kan tage afsted fra som en del af søgning
         afgang_stoppested: [],
+      //stoppestedder man kan komme hen til som en del af søgning
         ankomst_stoppested: [],
+      //hvilken afgang stoppested man har valgt
         selected_afgang: null,
+      //hvilken ankomst stoppested man har valgt
         selected_ankomst: null,
+
+      //temperaturen for ens lokation eller afgangs stoppestedet man har valgt
         temperature: null,
+      //chill faktoren for ens lokation eller afgangs stoppestedet man har valgt
         feels_like: null,
+      //vind hastigheden for ens lokation eller afgangs stoppestedet man har valgt
         wind_speed: null,
+      //hvilken vinkel vinden kommer fra for ens lokation eller afgangs stoppestedet man har valgt
         wind_degree: null,
+      //fugtigheden for ens lokation eller afgangs stoppestedet man har valgt
         humidity: null,
+      //trykket for ens lokation eller afgangs stoppestedet man har valgt
         pressure: null,
+      //vejr typen for ens lokation eller afgangs stoppestedet man har valgt
         weather_type: "",
+      //hvilken by ens lokation eller afgangs stoppestedet man har valgt er i
         current_city: "",
+      //hvad klokken og hvilken dag det er på en lokation eller afgangs stoppested man har valgt
         current_dateTime: "",
+      
+
+      //temperaturen for ankomst stoppestedet man har valgt
         dest_temperature: 0,
+      //chill faktoren for ankomst stoppestedet man har valgt
         dest_feels_like: 0,
+      //vind hastigheden for ankomst stoppestedet man har valgt
         dest_wind_speed: 0,
+      //hvilken vinkel vinden kommer fra for ankomst stoppestedet man har valgt
         dest_wind_degree: 0,
+      //fugtigheden for ankomst stoppestedet man har valgt
         dest_humidity: 0,
+      //trykket for ankomst stoppestedet man har valgt
         dest_pressure: 0,
+      //vejr typen for ankomst stoppestedet man har valgt
         dest_weather_type: "Choose a station first",
+      //hvilken by ankomst stoppestedet man har valgt er i
         dest_current_city: "City",
+      //hvad klokken og hvilken dag det er ankomst stoppested man har valgt
         dest_current_dateTime: "Date",
+
+      //styling til hvis den beregnede hastighed vil være for stor, og man ikke kan nå det
         styleObject: {
           background: '#800000',
           color: 'white',
           fontSize: '14px',
         },
+      //styling til ift hvor hurtigt man går, og man skal gå hurtigere eller langsomere etc
         styleObject2: {
           background: '#336eff',
           color: 'white',
           fontSize: '14px',
         },
+      
+      //hvor langt tid man har til at gå den givne hastighed
         timeRemaining: null,
         maksHastighed: "",
         trips: [],
@@ -446,7 +488,7 @@ var main = new Vue({
             this.wind_degree = response.data.wind.deg;
             this.weather_type = response.data.weather[0].main;
             this.current_dateTime = `${dateTime.toLocaleString('en-us', {  weekday: 'long' })} ${hours + ":" + minutes}`;
-          })
+          });
         }
       },
       AddMinutesToDate(date:any, minutes:any) {

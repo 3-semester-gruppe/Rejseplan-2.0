@@ -112,7 +112,7 @@
                 {{wind_degree}}&#176;
               </div>
             </div>
-            </div>
+          </div>
         </div>
     
         <div class="weather" id="weather">
@@ -262,10 +262,10 @@
         <div class="col-sm-4">
           <h3>Hvor hurtigt skal jeg gå?</h3>
           <p>For at kunne nå din destination i tide, anbefaler vi, at du i gennemsnit går:</p>
-        <b><p id="hastighed">{{ hastighed }} <span v-if="hastighed"> km/t</span></p></b>
-      <div :style="styleObject">
-        <p id="maksHastighed">{{ maksHastighed }}</p>
-      </div>
+          <b><p id="hastighed">{{ hastighed }} <span v-if="hastighed"> km/t</span></p></b>
+          <div :style="styleObject">
+            <p id="maksHastighed">{{ maksHastighed }}</p>
+          </div>
         </div>
         <div class="col-sm-4">
           <h3>Hvornår skal jeg afsted?</h3>
@@ -283,10 +283,10 @@
           <p>Din nuværende hastighed er:</p>
           <b><p id="speed">{{ current_average_speed }}<span v-if="current_average_speed"> km/t</span></p></b>
           <div :style="styleObject2">
-          <p id="idealSpeed">{{ idealSpeed }}</p>
+            <p id="idealSpeed">{{ idealSpeed }}</p>
+          </div>
         </div>
       </div>
-    </div>
   </div>
 
     <div class="container-md">
