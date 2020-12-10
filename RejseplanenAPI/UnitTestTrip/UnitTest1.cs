@@ -122,14 +122,28 @@ namespace UnitTestTrip
         public void AverageSpeedBoundaryValuesTest()
         {
             _trip.AverageSpeed = 0;
-            Assert.AreEqual(0, _trip.AverageSpeed);
+            Assert.AreEqual(0, _trip.AverageSpeed, 0.0001);
 
             _trip.AverageSpeed = 1;
-            Assert.AreEqual(1, _trip.AverageSpeed);
+            Assert.AreEqual(1, _trip.AverageSpeed, 0.0001);
+
+            _trip.AverageSpeed = 0.1;
+            Assert.AreEqual(0.1, _trip.AverageSpeed, 0.0001);
 
             try
             {
                 _trip.AverageSpeed = -1;
+                Assert.Fail();
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                Assert.AreEqual("AverageSpeed må ikke være negativt (Parameter 'AverageSpeed')",
+                    ex.Message);
+            }
+
+            try
+            {
+                _trip.AverageSpeed = -0.1;
                 Assert.Fail();
             }
             catch (ArgumentOutOfRangeException ex)

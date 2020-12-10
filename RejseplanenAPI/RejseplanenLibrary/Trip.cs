@@ -10,7 +10,7 @@ namespace RejseplanenLibrary
         private int _id;
         private string _userName;
         private string _endDestination;
-        private int _averageSpeed;
+        private double _averageSpeed;
         private int _distanceToWalk;
         private int _timeToWalk;
 
@@ -68,7 +68,7 @@ namespace RejseplanenLibrary
 
         public DateTime UserDepartureTime { get; set; }
 
-        public int AverageSpeed
+        public double AverageSpeed
         {
             get => _averageSpeed;
             set
@@ -117,7 +117,7 @@ namespace RejseplanenLibrary
             Id = IdCounter++;
         }
 
-        public Trip(string userName, string startDestination, string endDestination, DateTime departureTime, DateTime userDepartureTime, int averageSpeed, int distanceToWalk, int timeToWalk)
+        public Trip(string userName, string startDestination, string endDestination, DateTime departureTime, DateTime userDepartureTime, double averageSpeed, int distanceToWalk, int timeToWalk)
         {
             Id = IdCounter++;
             UserName = userName;
