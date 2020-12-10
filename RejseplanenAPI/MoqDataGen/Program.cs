@@ -57,7 +57,7 @@ namespace MoqDataGen
                     string postBody = JsonConvert.SerializeObject(value);
                     StringContent stringContent = new StringContent(postBody, Encoding.UTF8, "application/json");
                     Console.WriteLine((await client.PostAsync(Uri, stringContent)).StatusCode);
-                    Thread.Sleep(2000);
+                    Thread.Sleep(60000);
                 }
             }
         }
