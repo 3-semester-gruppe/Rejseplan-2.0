@@ -49,7 +49,7 @@ namespace RejseplanenLibrary
             {
                 if (string.IsNullOrWhiteSpace(value))
                 {
-                    throw new ArgumentNullException("Brugernavn", "Brugernavn må ikke være tomt eller have white space");
+                    throw new ArgumentNullException("Brugernavn", "Brugernavn må ikke stå tomt eller have white space");
                 }
 
                 if (value.Length < 2)

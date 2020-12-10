@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RejseplanenConsumer", "Rejs
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TripConsumer", "TripConsumer\TripConsumer.csproj", "{F85C7E62-833A-45B4-8007-C11629ABAFB4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoqDataGen", "MoqDataGen\MoqDataGen.csproj", "{7A1A65AE-65DF-408D-9DFA-95A3F32EABC7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoqDataGen", "MoqDataGen\MoqDataGen.csproj", "{7A1A65AE-65DF-408D-9DFA-95A3F32EABC7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestTrip", "UnitTestTrip\UnitTestTrip.csproj", "{46CAD586-20B3-446F-91AD-3220BB30D98C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{7A1A65AE-65DF-408D-9DFA-95A3F32EABC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A1A65AE-65DF-408D-9DFA-95A3F32EABC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A1A65AE-65DF-408D-9DFA-95A3F32EABC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46CAD586-20B3-446F-91AD-3220BB30D98C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46CAD586-20B3-446F-91AD-3220BB30D98C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46CAD586-20B3-446F-91AD-3220BB30D98C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46CAD586-20B3-446F-91AD-3220BB30D98C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

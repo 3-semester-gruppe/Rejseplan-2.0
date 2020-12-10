@@ -230,9 +230,6 @@
       </div>
     </div>
   -->
-      <p></p>
-    
-
     <div class="container-md well">
       <div class="row">
         <div class="col-sm-4">
@@ -297,7 +294,7 @@
         <div class="col-sm-4">
           <h3>Gem din rejse</h3>
           <p>Indtast dit brugernavn for at gemme rejsen:</p>
-          <input v-model="formData.userName" placeholder="Brugernavn" type="text">
+          <input id="brugernavn" v-model="formData.userName" placeholder="Brugernavn" type="text">
           <b><span v-if="addTrip">{{addTripStatus}}</span></b>
           <p></p>
           <button id="addBtn" v-on:click="addTrip()" class="btn btn-primary">Gem rejsen</button>
@@ -305,9 +302,9 @@
         <div class="col-sm-4">
           <h3>Søg efter gemte rejser</h3>
           <p>Indtast dit brugernavn for at søge efter gemte rejser:</p>
-          <input v-model="userNameToGetBy" placeholder="Brugernavn" type="text">
+          <input id="brugernavn2" v-model="userNameToGetBy" placeholder="Brugernavn" type="text">
           <p></p>
-          <button v-on:click="getByUserName(userNameToGetBy)" class="btn btn-primary">Søg efter rejser</button>
+          <button id="searchBtn" v-on:click="getByUserName(userNameToGetBy)" class="btn btn-primary">Søg efter rejser</button>
         </div>
         <div class="col-sm-4">
           <h3>Slet en gemt rejse</h3>
@@ -328,7 +325,7 @@
                <div id="getAllResult" class="list-group-item" v-for="trip in trips">
                   ID: {{trip.id}} | Brugernavn: {{trip.userName}} | Afgangssted: {{trip.startDestination}} | Ankomststed: {{trip.endDestination}} | Afgangstidspunkt: {{trip.departureTime}} | Dit afgangstidspunkt: {{trip.userDepartureTime}} | Gennemsnitshastighed: {{trip.averageSpeed }} <span v-if="hastighed"> km/t</span> | Distance: {{trip.distanceToWalk}} <span v-if="distance"> meter</span> | Tid: {{trip.timeToWalk}} <span v-if="timeRemaining"> minutter</span>
                   <p></p>
-                  <button class="notification" id="notification" @click="alertNotification(trip)">Vis notifikation</button>
+                  <button class="notification" id="notification" @click="alertNotification(trip)">Vis notifikationer for rejsen</button>
                 </div>
               </div>
             <div class="well" v-else>Du har ingen gemte rejser</div>
