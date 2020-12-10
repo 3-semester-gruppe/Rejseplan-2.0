@@ -20,6 +20,7 @@ namespace MoqDataGen
             bool upOrDown = true;
             while (true)
             {
+                Thread.Sleep(500);
                 if (upOrDown)
                 {
                     speed += Convert.ToDouble(random.Next(-10, 15)) / 100; 
@@ -56,7 +57,7 @@ namespace MoqDataGen
                     string postBody = JsonConvert.SerializeObject(value);
                     StringContent stringContent = new StringContent(postBody, Encoding.UTF8, "application/json");
                     Console.WriteLine((await client.PostAsync(Uri, stringContent)).StatusCode);
-                    Thread.Sleep(500);
+                    Thread.Sleep(2000);
                 }
             }
         }
