@@ -10701,6 +10701,7 @@ var main = new Vue({
         distance: null,
         //tidspunktet brugeren trykkede udregn
         userDepartureTime: null,
+        userDepartureTimeDisplay: null,
         //længdegrad for hvor man er
         longitude: null,
         //breddegrad for hvor man er
@@ -10918,7 +10919,9 @@ var main = new Vue({
                 this.maksHastighed = "";
             }
             let whenToLeaveDate = new Date(this.whenToLeave());
+            let whenToLeaveDateFormatted = new Intl.DateTimeFormat('en-GB', { dateStyle: 'full', timeStyle: 'short' }).format(whenToLeaveDate);
             this.userDepartureTime = whenToLeaveDate;
+            this.userDepartureTimeDisplay = whenToLeaveDateFormatted;
             //Tid tilbage i minutter
             let timeSubtract = Math.round(((whenToLeaveDate.getTime() - departure.getTime()) / 1000) / 60) / -1;
             this.timeRemaining = timeSubtract;
@@ -11067,8 +11070,8 @@ var main = new Vue({
             if (this.trips != null && this.trips.length > 0) {
                 let oldTime = new Date(trip.userDepartureTime);
                 let newTime = new Date(this.AddMinutesToDate(oldTime, 5));
-                let message1 = `${trip.startDestination} - ${trip.endDestination} \nDu skulle havde været ved dit stop ${trip.departureTime} \nEt stop på din rejse er forsinket`;
-                let message2 = `Din nye afgangstid er: ${newTime.toString()}`;
+                let message1 = `${trip.startDestination} - ${trip.endDestination} \nDu skulle have været ved dit stop ${trip.departureTime} \nEt stop på din rejse er forsinket, så afgangstidspunktet udskydes`;
+                let message2 = `Du skal derfor tage afsted: ${newTime.toString()}`;
                 alert(message1 + "\n" + message2);
             }
         },

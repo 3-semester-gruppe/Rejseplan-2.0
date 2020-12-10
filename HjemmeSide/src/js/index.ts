@@ -501,8 +501,8 @@ var main = new Vue({
         if(this.trips != null && this.trips.length > 0){
           let oldTime = new Date(trip.userDepartureTime);
           let newTime = new Date(this.AddMinutesToDate(oldTime, 5));
-          let message1 = `${trip.startDestination} - ${trip.endDestination} \nDu skulle havde været ved dit stop ${trip.departureTime} \nEt stop på din rejse er forsinket`;
-          let message2 = `Din nye afgangstid er: ${newTime.toString()}`
+          let message1 = `${trip.startDestination} - ${trip.endDestination} \nDu skulle have været ved dit stop ${trip.departureTime} \nEt stop på din rejse er forsinket, så afgangstidspunktet udskydes`;
+          let message2 = `Du skal derfor tage afsted: ${newTime.toString()}`
           alert(message1 + "\n" + message2);
         }
       },
