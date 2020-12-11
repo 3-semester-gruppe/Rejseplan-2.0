@@ -91,9 +91,11 @@ p{
     flex-direction: column;
     position: absolute;
     background-color: gray;
-    min-width: 58.4%;
-    min-height: 36.1%;
-    top: 0.5rem;
+    width: auto;
+    max-width: 40%;
+    min-height: 33%;
+    top: 30%;
+    left: 30%;
     border-radius: 0.5rem;
     justify-content: center;
     text-align: center;
@@ -121,9 +123,9 @@ p{
 }
 
 .popUp #footer{
-    width: 3%;
-    position: absolute;
+    display: flex;
     bottom: 0;
-    left: 47%;
     color: black;
+    justify-content: center;
+    left: 43%;
 }

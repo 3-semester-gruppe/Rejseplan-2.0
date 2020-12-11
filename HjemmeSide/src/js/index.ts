@@ -196,6 +196,7 @@ var main = new Vue({
       //Pop beskeder  
         popUp_message1: "",
         popUp_message2: "",
+        popUp_message2_5: "",
         popUp_message3: "",
         popUp_message4: ""
     },
@@ -511,11 +512,13 @@ var main = new Vue({
       alertNotification(trip:ITrip){
         if(this.trips != null && this.trips.length > 0){
           let message1 = `${trip.startDestination} - ${trip.endDestination}`;
-          let message2 = `Du skulle have været ved dit stop ${trip.departureTime} \nEt stop på din rejse er forsinket, så afgangstidspunktet udskydes`;
+          let message2 = `Du skulle have været ved dit stop ${trip.departureTime}`;
+          let message2_5 = `Et stop på din rejse er forsinket, så afgangstidspunktet udskydes`;
           let message3 = `Du skal derfor tage afsted: ${trip.userDepartureTime}`;
           let message4 = `+ ${delayedTime} min`;
           this.popUp_message1 = message1;
           this.popUp_message2 = message2;
+          this.popUp_message2_5 = message2_5;
           this.popUp_message3 = message3;
           this.popUp_message4 = message4;
         }
