@@ -31,48 +31,7 @@
 </style>
 <body>
   <div id="app" class="container">
-    <!-- <div class="jumbotron">
-      <div id="Search">
-        <h1>
-          <input v-model="search" placeholder="Search">
-          <input v-model="afgang" placeholder="Din lokation" @keyup="getAfgangTimeOut()" list="afgang_stoppested">
-          <datalist id="afgang_stoppested">
-            <option v-for="stoppested in afgang_stoppested">
-              {{stoppested.name}}
-            </option>
-          </datalist>
-          <input v-model="ankomst" placeholder="Ankomst" @keyup="getAnkomstTimeOut()" list="ankomst_stoppested">
-          <datalist id="ankomst_stoppested">
-            <option v-for="stoppested in ankomst_stoppested">
-              {{stoppested.name}}
-            </option>
-          </datalist>
 
-        </h1>
-        <button v-on:click="getLibraryAsync()" class="btn btn-primary">Search</button>
-        <button v-on:click="deleteLibraryAsync()" class="btn btn-primary">Done</button>
-
-
-        <button id="hastighedBtn" v-on:click="getHastighed()" class="btn btn-primary">Hastighed</button> -->
-        <!--
-          <button id="getLocation" v-on:click="getLocation()" class="btn btn-primary">Location</button>
-          <button v-on:click="getAfgang()" class="btn btn-primary">Afgang</button>
-          <button v-on:click="getAnkomst()" class="btn btn-primary">Ankomst</button>
-          <button v-on:click="getDistance()" class="btn btn-primary">Distance</button>
-        -->
-
-
-
-      <!-- </div>
-      <library v-for="library in librarys" v-bind:key="library.id" v-bind:library="library"></library>
-      <input id="distanceInput" type="text" v-model="distance">
-      <input id="departureTime" type="datetime-local" v-model="departureTime">
-      <p id="distance">{{ distance }}<span v-if="distance"> meter</span></p>
-      <p id="departure">{{ departureTime }}</p>
-      <p id="hastighed">{{ hastighed }}</p>
-      <p id="userDepartureTime">{{ userDepartureTime }}</p>
-    </div> -->
-    
     <div id="banner1" class="jumbotron text-center">
       <h2>Rejseplanen 2.0</h2>
       <p>Din virtuelle assistent når du skal på farten</p> 
@@ -154,82 +113,6 @@
       </div>
     </div>
 
-    <!-- <div class="weatherInBanner">
-      <div class="weather" id="weather">
-        <div class="weatherHeader" id="weatherHeader">
-          <h6> {{current_dateTime}} </h6>
-          <h2> {{current_city}} </h2>
-        </div>
-          <div class="weatherMain" id="weatherMain">
-            <div class="weatherIcon" id="weatherIcon">
-              {{weather_type}}
-            </div>
-          <div class="weatherInfo" id="weatherInfo">
-            <div class="temp" id="temp">
-              <i class="fas fa-thermometer-half"></i>
-              {{temperature}} &#176;C <br>
-            </div>
-            <div class="feels" id="feels">
-              <i class="fas fa-temperature-low"></i>
-              {{feels_like}} &#176;C 
-            </div>
-            <div class="humid" id="humid">
-              <i class="fas fa-tint"></i>
-              {{humidity}}%
-            </div>
-            <div class="pressure" id="pressure">
-              <i class="far fa-gem"></i>
-              {{pressure}}p
-            </div>
-            <div class="wind" id="wind">
-              <i class="fas fa-wind"></i>
-              {{wind_speed}} m/s
-              <br>
-              <i class="fas fa-wind"></i>
-              {{wind_degree}}&#176;
-            </div>
-          </div>
-          </div>
-      </div>
-  
-      <div class="weather" id="weather">
-        <div class="weatherHeader" id="weatherHeader">
-          <h6> {{dest_current_dateTime}} </h6>
-          <h2> {{dest_current_city}} </h2>
-        </div>
-          <div class="weatherMain" id="weatherMain">
-            <div class="weatherIcon" id="weatherIcon">
-              {{dest_weather_type}}
-            </div>
-          <div class="weatherInfo" id="weatherInfo">
-            <div class="temp" id="temp">
-              <i class="fas fa-thermometer-half"></i>
-              {{dest_temperature}} &#176;C <br>
-            </div>
-            <div class="feels" id="feels">
-              <i class="fas fa-temperature-low"></i>
-              {{dest_feels_like}} &#176;C 
-            </div>
-            <div class="humid" id="humid">
-              <i class="fas fa-tint"></i>
-              {{dest_humidity}}%
-            </div>
-            <div class="pressure" id="pressure">
-              <i class="far fa-gem"></i>
-              {{dest_pressure}}p
-            </div>
-            <div class="wind" id="wind">
-              <i class="fas fa-wind"></i>
-              {{dest_wind_speed}} m/s
-              <br>
-              <i class="fas fa-wind"></i>
-              {{dest_wind_degree}}&#176;
-            </div>
-          </div>
-          </div>
-      </div>
-    </div>
-  -->
     <div class="container-md well">
       <div class="row">
         <div class="col-sm-4">
@@ -325,7 +208,7 @@
                <div id="getAllResult" class="list-group-item" v-for="trip in trips">
                   ID: {{trip.id}} | Brugernavn: {{trip.userName}} | Afgangssted: {{trip.startDestination}} | Ankomststed: {{trip.endDestination}} | Afgangstidspunkt: {{trip.departureTime}} | Dit afgangstidspunkt: {{trip.userDepartureTime}} | Gennemsnitshastighed: {{trip.averageSpeed }} <span v-if="hastighed"> km/t</span> | Distance: {{trip.distanceToWalk}} <span v-if="distance"> meter</span> | Tid: {{trip.timeToWalk}} <span v-if="timeRemaining"> minutter</span>
                   <p></p>
-                  <button class="notification" id="notification" @click="alertNotification(trip)">Vis notifikationer for rejsen</button>
+                  <button class="notification" id="notification" @click="openPopup(trip)">Vis notifikationer for rejsen</button>
                 </div>
               </div>
             <div class="well" v-else>Du har ingen gemte rejser</div>
@@ -340,6 +223,23 @@
       		<button class="btn-danger" @click="cancelAlarm()">Slå alarm fra</button>
     		</div>
         </div>
+      </div>
+    </div>
+
+    <div class="popUp" id="popUp">
+      <div class="header" id="header">
+        {{popUp_message1}}
+      </div>
+      <div class="main" id="main">
+        {{popUp_message2}}  
+      </div>
+      <div class="main2" id="main2">
+        <p>{{popUp_message3}}
+          <run>{{popUp_message4}}</run>
+        </p>
+      </div>
+      <div class="footer" id="footer">
+        <button id="popUpClose" @click="closePopup">Close</button>
       </div>
     </div>
 

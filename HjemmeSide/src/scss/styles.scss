@@ -83,3 +83,47 @@ p{
 .wind{
     margin-right: 0rem!important;
 }
+
+.popUp{
+    visibility: hidden;
+    opacity: 0;
+    display: flex!important;
+    flex-direction: column;
+    position: absolute;
+    background-color: gray;
+    min-width: 58.4%;
+    min-height: 36.1%;
+    top: 0.5rem;
+    border-radius: 0.5rem;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    transition: opacity 0.3s;
+    box-shadow: 2px 5px 10px #000000
+}
+
+.show{
+    opacity: 1;
+    visibility: visible!important;
+}
+.invis{
+    opacity: 0;
+    visibility: hidden!important;
+}
+
+.popUp >div{
+    padding: 2rem;
+    font-size: 2rem;
+}
+
+.popUp .main2 run{
+    color: rgb(139, 60, 60);
+}
+
+.popUp #footer{
+    width: 3%;
+    position: absolute;
+    bottom: 0;
+    left: 47%;
+    color: black;
+}

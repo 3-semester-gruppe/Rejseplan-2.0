@@ -192,7 +192,12 @@ var main = new Vue({
 
       //hvorvidt man har trykket start ift at finde en rute
         active: false,
-        
+
+      //Pop beskeder  
+        popUp_message1: "",
+        popUp_message2: "",
+        popUp_message3: "",
+        popUp_message4: ""
     },
     created: function () {
       //når hjemmesiden bliver startet kører vi en funktion der holder styr på at ens gennemsnitshastighed bliver regnet ud
@@ -267,9 +272,6 @@ var main = new Vue({
           let userDepartureTimeFormatted = new Intl.DateTimeFormat('en-GB', { dateStyle: 'full', timeStyle: 'short' }).format(userDepartureTime);
           this.trips[i].userDepartureTime = userDepartureTimeFormatted;
         };
-
-
-
       },
       //POST Trip
       async addTripAsync() {
@@ -505,12 +507,17 @@ var main = new Vue({
         });
       },
 
-      //giver en notifikation om at ens afgang er forsinket
+      //skriver notification data ind i popup
       alertNotification(trip:ITrip){
         if(this.trips != null && this.trips.length > 0){
-          let message1 = `${trip.startDestination} - ${trip.endDestination} \nDu skulle have været ved dit stop ${trip.departureTime} \nEt stop på din rejse er forsinket, så afgangstidspunktet udskydes`;
-          let message2 = `Du skal derfor tage afsted: ${trip.userDepartureTime} + ${delayedTime} min`
-          alert(message1 + "\n" + message2);
+          let message1 = `${trip.startDestination} - ${trip.endDestination}`;
+          let message2 = `Du skulle have været ved dit stop ${trip.departureTime} \nEt stop på din rejse er forsinket, så afgangstidspunktet udskydes`;
+          let message3 = `Du skal derfor tage afsted: ${trip.userDepartureTime}`;
+          let message4 = `+ ${delayedTime} min`;
+          this.popUp_message1 = message1;
+          this.popUp_message2 = message2;
+          this.popUp_message3 = message3;
+          this.popUp_message4 = message4;
         }
       },
 
@@ -604,6 +611,20 @@ var main = new Vue({
         }
         clearTimeout(this.alarm_loop);
         alert("Alarm cancelled!");
+      },
+
+      //Popup
+      openPopup(trip:ITrip){
+        this.alertNotification(trip)
+        console.log("yeehaw");
+        const popup = <HTMLDivElement>document.getElementById('popUp');
+        popup.classList.remove('invis')
+        popup.classList.add('show');
+      },
+      closePopup(){
+        const popup = <HTMLDivElement>document.getElementById('popUp');
+        popup.classList.remove('show')
+        popup.classList.add('invis');
       }
     }
 })
