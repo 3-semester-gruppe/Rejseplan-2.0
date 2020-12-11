@@ -201,20 +201,35 @@ var main = new Vue({
       
       //viser ens gemte rejser
         trips: [],
+      //brugernavn der gemmes under
         userName: "",
+      //brugernavn der hentes fra
         userNameToGetBy: "",
+      //hvilket id der skal slettes af tripsene
         removeTripId: null,
+      //hvorvidt der blev slettet en trip eller ej
         removeTripStatus: "",
+      //hvorvidt der blev tilføjet en trip eller ej
         addTripStatus: "",
+
+      //ens nuværende hastighed baseret på målinger fra raspberryPi
         current_average_speed: 0,
+      //det tidspunkt man begynder at gå
         start_time: Date(),
-        moving: true,
+      //feedback på ens hastighed
         idealSpeed: "",
+      
+      //timerne der skal gå før alarmen skal gå
         alarm_hours: null,
+      //minuterne der skal gå før alarmen skal gå
         alarm_minutes: null,
+      //hvornår alarmen skal gå
         alarm_time: null,
+      //hvorvidt alarmen er aktiv
         alarm_ring: false,
         alarm_set: false,
+
+      //hvorvidt man har trykket start ift at finde en rute
         active: false
     },
     created: function () {
