@@ -9,15 +9,18 @@ import axios, {
 } from "../../node_modules/axios/index"
 
 //url til hastigheds målinger
-let baseUrl = 'https://rejseplanenapi20201207103315.azurewebsites.net/api/libraries/';
+let baseUrl:string = 'https://rejseplanenapi20201207103315.azurewebsites.net/api/libraries/';
 //url til gemte rejser
-let baseUrlTrip = 'https://rejseplanenapi20201207103315.azurewebsites.net/api/Trip/';
+let baseUrlTrip:string = 'https://rejseplanenapi20201207103315.azurewebsites.net/api/Trip/';
 
 //url support til vejr api
-let openWeatherBaseUrl = "https://api.openweathermap.org/data/2.5/weather?"
-let openWeatherLat = "lat="
-let openWeatherLong = "&lon="
-let openWeatherApiKey = "&appid=412be2f2e33e80c87ba34e35ac054489"
+let openWeatherBaseUrl:string = "https://api.openweathermap.org/data/2.5/weather?";
+let openWeatherLat:string = "lat=";
+let openWeatherLong:string = "&lon=";
+let openWeatherApiKey:string = "&appid=412be2f2e33e80c87ba34e35ac054489";
+
+//tiden som din rute er delayed med
+let delayedTime:number = 5;
 
 //class til brug af rejseplanens api
 class Location{
@@ -502,21 +505,11 @@ var main = new Vue({
         });
       },
 
-      //tilføjer minuter til en given funktion 
-      AddMinutesToDate(date:any, minutes:any) :Date {
-          return new Date(date.getTime() + minutes*60000);
-      },
-
       //giver en notifikation om at ens afgang er forsinket
       alertNotification(trip:ITrip){
         if(this.trips != null && this.trips.length > 0){
-          let oldTime = new Date(trip.userDepartureTime);
-          let newTime = new Date(this.AddMinutesToDate(oldTime, 5));
-          let newTimeFormatted = new Intl.DateTimeFormat('en-GB', { dateStyle: 'full', timeStyle: 'short' }).format(newTime);
-          let tripDate = new Date(trip.departureTime);
-          let departureTimeFormatted = new Intl.DateTimeFormat('en-GB', { dateStyle: 'full', timeStyle: 'short' }).format(tripDate);
-          let message1 = `${trip.startDestination} - ${trip.endDestination} \nDu skulle have været ved dit stop ${departureTimeFormatted} \nEt stop på din rejse er forsinket, så afgangstidspunktet udskydes`;
-          let message2 = `Du skal derfor tage afsted: ${newTimeFormatted.toString()}`
+          let message1 = `${trip.startDestination} - ${trip.endDestination} \nDu skulle have været ved dit stop ${trip.departureTime} \nEt stop på din rejse er forsinket, så afgangstidspunktet udskydes`;
+          let message2 = `Du skal derfor tage afsted: ${trip.userDepartureTime} + ${delayedTime} min`
           alert(message1 + "\n" + message2);
         }
       },
