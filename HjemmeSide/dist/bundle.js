@@ -10634,15 +10634,6 @@ let openWeatherBaseUrl = "https://api.openweathermap.org/data/2.5/weather?";
 let openWeatherLat = "lat=";
 let openWeatherLong = "&lon=";
 let openWeatherApiKey = "&appid=412be2f2e33e80c87ba34e35ac054489";
-//url support til rejseplanens api
-let rejseplanenbaseurl = "http://xmlopen.rejseplanen.dk/bin/rest.exe";
-let format = "&format=json";
-//formater til rejseplanens api
-var dms = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
-var utm = "+proj=utm +zone=32N +etrs=1989";
-var wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
-//variabel til alarmen
-var alarm_loop;
 //class til brug af rejseplanens api
 class Location {
     constructor(Name, Coord, Distance) {
@@ -10653,29 +10644,6 @@ class Location {
 }
 //Vue support til dropdown når der søges efter stationer
 Vue.component('v-select', VueSelect.VueSelect);
-//Component til visning af hastigheds målinger
-// Vue.component('library', {
-//     props: ['library'],
-//     methods: {
-//     },
-//     template: `
-//         <div class="jumbotron library">
-//             <h1>{{ library.brugernavn }}</h1>
-//             <div class="hastighed-row">
-//                 <h2 class="library-stat">Hastighed:</h2>
-//                 <h2 class="library-info">{{ library.hastighed }}</h2>
-//             </div>
-//             <div class="hastighed-row">
-//                 <h2 class="library-stat">TimeStamp:</h2>
-//                 <h2 class="library-info">{{ library.timestamp }}</h2>
-//             </div>
-//             <div class="hastighed-row">
-//                 <h2 class="library-stat">Year of publication:</h2>
-//                 <h2 class="library-info">{{ library.id }}</h2>
-//             </div>
-//         </div>
-//     `
-// })
 //vue object
 var main = new Vue({
     // TypeScript compiler complains about Vue because the CDN link to Vue is in the html file.
@@ -10684,11 +10652,6 @@ var main = new Vue({
     el: "#app",
     //Alt dataen der bruges i sammenhæng med vue
     data: {
-        //bruges til visning af hastigheds målinger
-        //librarys: [],
-        // search: "",
-        //bruges i forbindelse med at finde stopsteder i nærheden
-        // locationArray: [],
         //hvor der skal være afgang fra
         afgang: "",
         //hvor der skal ankommes til
@@ -10768,30 +10731,48 @@ var main = new Vue({
         maksHastighed: "",
         //viser ens gemte rejser
         trips: [],
+        //brugernavn der gemmes under
         userName: "",
+        //brugernavn der hentes fra
         userNameToGetBy: "",
+        //hvilket id der skal slettes af tripsene
         removeTripId: null,
+        //hvorvidt der blev slettet en trip eller ej
         removeTripStatus: "",
+        //hvorvidt der blev tilføjet en trip eller ej
         addTripStatus: "",
+        //ens nuværende hastighed baseret på målinger fra raspberryPi
         current_average_speed: 0,
+        //det tidspunkt man begynder at gå
         start_time: Date(),
-        moving: true,
+        //feedback på ens hastighed
         idealSpeed: "",
+        //timerne der skal gå før alarmen skal gå
         alarm_hours: null,
+        //minuterne der skal gå før alarmen skal gå
         alarm_minutes: null,
+        //hvornår alarmen skal gå
         alarm_time: null,
+        //hvorvidt alarmen er aktiv
         alarm_ring: false,
         alarm_set: false,
-        active: false
+        //variabel til alarmen
+        alarm_loop: 0,
+        //hvorvidt man har trykket start ift at finde en rute
+        active: false,
     },
     created: function () {
+        //når hjemmesiden bliver startet kører vi en funktion der holder styr på at ens gennemsnitshastighed bliver regnet ud
         this.interval = setInterval(() => this.updateSpeedAsync(), 1000);
+        this.getWeatherFromLatLong();
+        this.getLocation();
     },
     methods: {
-        //updates the current speed of the master user
+        //updatere gennemsnits hastigheden for brugeren
         async updateSpeedAsync() {
             if (this.active) {
                 let totalMeasurements;
+                //et kald til vores api om målinger af hastighed
                 try {
                     totalMeasurements = await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.get(baseUrl + "/brugernavn/" + "henrik").then(response => { return response.data; }); //moq username / master user
                 }
@@ -10837,6 +10818,7 @@ var main = new Vue({
                 return { data: 0 };
             }
         },
+        //metode der sørger for at trips bliver updateret og binder med knappen i html dokumentet
         async getByUserName(url) {
             let response = await this.getByUserNameAsync(url);
             this.trips = response.data;
@@ -10860,6 +10842,7 @@ var main = new Vue({
                 this.addTripStatus = "Rejsen blev ikke gemt!";
             }
         },
+        //metode der sørger for at trips bliver lavet og sendt til vores api og binder med knappen i html dokumentet
         async addTrip() {
             let response = await this.addTripAsync();
             this.addTripStatus = "Status: " + response.status + " " + response.statusText;
@@ -10874,58 +10857,52 @@ var main = new Vue({
                 this.removeTripStatus = "Ugyldigt ID!";
             }
         },
+        //metode der sørger for at trips bliver slettet fra vores api og binder med knappen i html dokumentet
         async deleteTrip(url) {
             let response = await this.deleteTripAsync(url);
             this.removeTripStatus = "Status: " + response.status + " " + response.statusText;
         },
-        // async getLibraryAsync(){
-        //     try {
-        //         axios.get<ILibrary[]>(baseUrl + "/brugernavn/" + this.search, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } ).then().catch(error => this.librarys = [])
-        //         .then(result => {this.librarys = result.data;})
-        //         .catch(error => {return []});
-        //     }
-        //     catch ( error: AxiosError){
-        //         this.message = error.message;
-        //         alert(error.message);
-        //     }
-        // },
-        // async deleteLibraryAsync(){
-        //     try {
-        //         axios.delete(baseUrl + "/brugernavn/" + this.search, {headers: {"Access-Control-Allow-Origin": "*","Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS","Access-Control-Allow-Credentials": "true"} } ).then(error => this.librarys = []).catch(error => this.librarys = [])
-        //     }
-        //     catch ( error: AxiosError){
-        //         this.message = error.message;
-        //         alert(error.message);
-        //     }
-        // },
+        //finder gennemsnits hastigheden man skal holde for at komme til sin destination i tide
         getHastighed() {
+            //fortæller at brugeren nu skal bruge sin gennemsnits hastighed
             this.active = true;
+            //sletter målinger for hastighed før dette punkt
             try {
                 _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.delete(baseUrl + "/brugernavn/" + "henrik"); //moq username / master user
             }
             catch (error) {
             }
+            //sætter tidspunktet brugeren starter med at gå til nu
             this.start_time = Date();
+            //finder distancen der skal gås, hvis brugeren vælger et stoppested de går fra eller ej
             if (this.afgang == "") {
                 this.getDistanceFromLocation();
             }
             else {
                 this.getDistance();
             }
+            //tidspunktet brugeren skal være ved sit stoppested
             let departure = new Date(this.departureTime);
+            //nuværrende tidspunkt
             let now = new Date(Date.now());
+            //hvor langt tid der er til at brugeren skal være ved sin destination i timer
             let deltaTime = (departure.getTime() - now.getTime()) / (1000 * 3600);
+            //regnerhastigheden brugeren skal gå ud i km / t
             this.hastighed = Math.round((this.distance / 1000 / deltaTime) * 100) / 100;
+            //hvis hastigheden er under fem, skal brugeren bare gå 5km/t
             if (this.hastighed <= 5) {
                 this.hastighed = 5;
             }
+            //hvis hastigheden  er over ti, fortæller vi brugeren at de nok ikke når det
             if (this.hastighed > 10) {
                 this.maksHastighed = "Vi estimerer, at du ikke vil nå dit ankomststed i tide. Vælg venligst et senere tidspunkt.";
             }
             else {
                 this.maksHastighed = "";
             }
+            //hvornår brugeren skal gå
             let whenToLeaveDate = new Date(this.whenToLeave());
+            //hvornår brugeren skal gå formatereret pænere
             let whenToLeaveDateFormatted = new Intl.DateTimeFormat('en-GB', { dateStyle: 'full', timeStyle: 'short' }).format(whenToLeaveDate);
             this.userDepartureTime = whenToLeaveDate;
             this.userDepartureTimeDisplay = whenToLeaveDateFormatted;
@@ -10933,6 +10910,7 @@ var main = new Vue({
             let timeSubtract = Math.round(((whenToLeaveDate.getTime() - departure.getTime()) / 1000) / 60) / -1;
             this.timeRemaining = timeSubtract;
         },
+        //regner ud hvornår brugeren skal gå
         whenToLeave() {
             let timeToArrive = this.distance / 1000 / this.hastighed;
             let departureTime = new Date(this.departureTime);
@@ -10940,6 +10918,7 @@ var main = new Vue({
             timeToLeave.setTime(departureTime.getTime() - (((timeToArrive * 60) * 60) * 1000));
             return timeToLeave;
         },
+        //sørger for at finde stoppesteder, når man skal skrive hvor man rejser fra
         getAfgangTimeOut() {
             if (this.timer) {
                 clearTimeout(this.timer);
@@ -10949,6 +10928,7 @@ var main = new Vue({
                 this.getAfgang();
             }, 500);
         },
+        //sørger for at finde stoppesteder, når man skal skrive hvor man rejser til
         getAnkomstTimeOut() {
             if (this.timer) {
                 clearTimeout(this.timer);
@@ -10958,19 +10938,8 @@ var main = new Vue({
                 this.getAnkomst();
             }, 500);
         },
-        // getNearbyStops(x:number, y:number) {
-        //   let path: string = rejseplanenbaseurl + `/stopsNearby?coordX=${x}&coordY=${y}${format}`
-        //   axios
-        //   .get(path)
-        //   .then(response=> {
-        //     let newLocation: Location;
-        //     response.data.LocationList.StopLocation.forEach((location:any) => {
-        //       newLocation = new Location(location.name, this.fromWgsToDms(Number(location.y / 1000000), Number(location.x / 1000000)), location.distance);
-        //       this.locationArray.push(newLocation)
-        //     });
-        //   })
-        // },
         async asyncGetAfgang() {
+            let format = "&format=json";
             let path = `http://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.afgang}&${format}`;
             try {
                 return await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.get(path);
@@ -10978,6 +10947,7 @@ var main = new Vue({
             catch (_a) { }
         },
         async asyncGetAnkomst() {
+            let format = "&format=json";
             let path = `http://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.ankomst}&${format}`;
             try {
                 return await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.get(path);
@@ -10992,26 +10962,30 @@ var main = new Vue({
             let response = await this.asyncGetAnkomst();
             this.ankomst_stoppested = response.data.LocationList.StopLocation;
         },
+        //omregning af koordinater
         fromDmsToWgs(x, y) {
+            let dms = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
+            let wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
             let convertedNum = Object(proj4__WEBPACK_IMPORTED_MODULE_0__["default"])(dms, wgs84, [x, y]);
             return convertedNum;
         },
         fromWgsToDms(x, y) {
+            let dms = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
+            let wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
             let convertedNum = Object(proj4__WEBPACK_IMPORTED_MODULE_0__["default"])(wgs84, dms, [x, y]);
             return convertedNum;
         },
+        //får brugeren position
         getLocation() {
             navigator.geolocation.getCurrentPosition(position => {
                 this.longitude = position.coords.longitude;
                 this.latitude = position.coords.latitude;
-                //this.afgang = position.coords.longitude.toString() + " "  + position.coords.latitude.toString();
             });
         },
+        //regner distance ud mellem de to punkter brugeren skal gå i meter
         calculateDistance(lat1, lng1, lat2, lng2) {
             var radlat1 = Math.PI * lat1 / 180;
             var radlat2 = Math.PI * lat2 / 180;
-            var radlon1 = Math.PI * lng1 / 180;
-            var radlon2 = Math.PI * lng2 / 180;
             var theta = lng1 - lng2;
             var radtheta = Math.PI * theta / 180;
             var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
@@ -11024,6 +10998,7 @@ var main = new Vue({
             dist = dist * 1000;
             return dist;
         },
+        //finder koordinater fra stoppestederne og finder distance derimellem
         getDistance() {
             this.selected_afgang = this.afgang_stoppested.find((i) => i.name === this.afgang);
             this.selected_ankomst = this.ankomst_stoppested.find((i) => i.name === this.ankomst);
@@ -11031,6 +11006,7 @@ var main = new Vue({
             var ankomst_Dms = this.fromWgsToDms(Number(this.selected_ankomst.y / 1000000), Number(this.selected_ankomst.x / 1000000));
             this.distance = Math.round(this.calculateDistance(afgang_Dms[0], afgang_Dms[1], ankomst_Dms[0], ankomst_Dms[1]));
         },
+        //finder koordinater fra ens position og stoppestedet og finder distance derimellem
         getDistanceFromLocation() {
             navigator.geolocation.getCurrentPosition(position => {
                 var longitude = position.coords.longitude;
@@ -11041,6 +11017,7 @@ var main = new Vue({
                 this.getDestWeather(this.selected_ankomst);
             });
         },
+        //sørger for kald til vores vejr api bliver lavet og formaterer dem til hjemmesiden
         async getWeatherFromLatLong() {
             let weatherData;
             let dateTime = new Date();
@@ -11070,9 +11047,11 @@ var main = new Vue({
                 });
             });
         },
+        //tilføjer minuter til en given funktion 
         AddMinutesToDate(date, minutes) {
             return new Date(date.getTime() + minutes * 60000);
         },
+        //giver en notifikation om at ens afgang er forsinket
         alertNotification(trip) {
             if (this.trips != null && this.trips.length > 0) {
                 let oldTime = new Date(trip.userDepartureTime);
@@ -11082,6 +11061,7 @@ var main = new Vue({
                 alert(message1 + "\n" + message2);
             }
         },
+        //sørger for kald til vores vejr api bliver lavet og formaterer dem til hjemmesiden
         async getDestWeather(destination) {
             let coords = this.fromWgsToDms(Number(destination.y / 1000000), Number(destination.x / 1000000));
             let lat = coords[0];
@@ -11111,6 +11091,7 @@ var main = new Vue({
                 this.dest_current_dateTime = `${dateTime.toLocaleString('en-us', { weekday: 'long' })} ${hours + ":" + minutes}`;
             });
         },
+        //set en alarm til at kører om et given stykke tid
         ringAlarm() {
             var date = new Date();
             var time_now_hours = date.getHours().toString();
@@ -11152,25 +11133,24 @@ var main = new Vue({
                     this.alarm_time = "";
                     this.alarm_set = false;
                     this.alarm_ring = false;
-                    clearTimeout(alarm_loop);
+                    clearTimeout(this.alarm_loop);
                 }
                 else {
-                    alarm_loop = setTimeout(this.ringAlarm, 1000);
+                    this.alarm_loop = setTimeout(this.ringAlarm, 1000);
                 }
             }
         },
+        //stopper alarmen
         cancelAlarm() {
             this.alarm_set = false;
             if (this.alarm_ring == true) {
                 this.alarm_ring = false;
             }
-            clearTimeout(alarm_loop);
+            clearTimeout(this.alarm_loop);
             alert("Alarm cancelled!");
         }
     }
 });
-main.getLocation();
-main.getWeatherFromLatLong();
 
 
 /***/ }),
