@@ -10764,9 +10764,11 @@ var main = new Vue({
         },
         //hvor langt tid man har til at gå den givne hastighed
         timeRemaining: null,
+        //bliver skrevet i når man går for hurtigt
         maksHastighed: "",
+        //viser ens gemte rejser
         trips: [],
-        formData: { userName: "", startDestination: "", endDestination: "", departureTime: null, userDepartureTime: null, averageSpeed: null, distanceToWalk: null, timeToWalk: null },
+        userName: "",
         userNameToGetBy: "",
         removeTripId: null,
         removeTripStatus: "",
@@ -10794,6 +10796,9 @@ var main = new Vue({
                     totalMeasurements = await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.get(baseUrl + "/brugernavn/" + "henrik").then(response => { return response.data; }); //moq username / master user
                 }
                 catch (error) {
+                }
+                if (totalMeasurements == undefined) {
+                    return;
                 }
                 let start_time;
                 //sletter measurements før start
@@ -10839,17 +10844,19 @@ var main = new Vue({
         //POST Trip
         async addTripAsync() {
             try {
-                this.formData.startDestination = this.afgang;
-                this.formData.endDestination = this.ankomst;
-                this.formData.departureTime = this.departureTime;
-                this.formData.userDepartureTime = this.userDepartureTime;
-                this.formData.averageSpeed = this.hastighed;
-                this.formData.distanceToWalk = this.distance;
-                this.formData.timeToWalk = this.timeRemaining;
-                return await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.post(baseUrlTrip, this.formData);
+                let postData = {};
+                postData.startDestination = this.afgang;
+                postData.endDestination = this.ankomst;
+                postData.departureTime = this.departureTime;
+                postData.userDepartureTime = this.userDepartureTime;
+                postData.averageSpeed = this.hastighed;
+                postData.distanceToWalk = this.distance;
+                postData.timeToWalk = this.timeRemaining;
+                postData.userName = this.userName;
+                return await _node_modules_axios_index__WEBPACK_IMPORTED_MODULE_1___default.a.post(baseUrlTrip, postData);
             }
             catch (error) {
-                this.addTripStatus = error.message;
+                console.log(error.message);
                 this.addTripStatus = "Rejsen blev ikke gemt!";
             }
         },

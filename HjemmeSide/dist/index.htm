@@ -294,7 +294,7 @@
         <div class="col-sm-4">
           <h3>Gem din rejse</h3>
           <p>Indtast dit brugernavn for at gemme rejsen:</p>
-          <input id="brugernavn" v-model="formData.userName" placeholder="Brugernavn" type="text">
+          <input id="brugernavn" v-model="userName" placeholder="Brugernavn" type="text">
           <b><span v-if="addTrip">{{addTripStatus}}</span></b>
           <p></p>
           <button id="addBtn" v-on:click="addTrip()" class="btn btn-primary">Gem rejsen</button>
