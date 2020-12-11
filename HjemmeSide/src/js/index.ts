@@ -254,6 +254,19 @@ var main = new Vue({
       async getByUserName(url: string) {
         let response = await this.getByUserNameAsync(url);
         this.trips = response.data;
+
+        for(let i = 0; i < response.data.length; i++) {
+          let departureTime = new Date(this.trips[i].departureTime);
+          let departureTimeFormatted = new Intl.DateTimeFormat('en-GB', { dateStyle: 'full', timeStyle: 'short' }).format(departureTime);
+          this.trips[i].departureTime = departureTimeFormatted;
+
+          let userDepartureTime = new Date(this.trips[i].userDepartureTime);
+          let userDepartureTimeFormatted = new Intl.DateTimeFormat('en-GB', { dateStyle: 'full', timeStyle: 'short' }).format(userDepartureTime);
+          this.trips[i].userDepartureTime = userDepartureTimeFormatted;
+        };
+
+
+
       },
       //POST Trip
       async addTripAsync() {
@@ -380,12 +393,12 @@ var main = new Vue({
       },
       async asyncGetAfgang() {
         let format: string = "&format=json";
-        let path: string = `http://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.afgang}&${format}`;
+        let path: string = `https://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.afgang}&${format}`;
         try {return await axios.get<IStoppested[]>(path) } catch {}
       },
       async asyncGetAnkomst() {
         let format: string = "&format=json";
-        let path: string = `http://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.ankomst}&${format}`;
+        let path: string = `https://xmlopen.rejseplanen.dk/bin/rest.exe/location?input=${this.ankomst}&${format}`;
         try {return await axios.get<IStoppested[]>(path) } catch {}
       },
       async getAfgang() {
@@ -499,8 +512,11 @@ var main = new Vue({
         if(this.trips != null && this.trips.length > 0){
           let oldTime = new Date(trip.userDepartureTime);
           let newTime = new Date(this.AddMinutesToDate(oldTime, 5));
-          let message1 = `${trip.startDestination} - ${trip.endDestination} \nDu skulle have været ved dit stop ${trip.departureTime} \nEt stop på din rejse er forsinket, så afgangstidspunktet udskydes`;
-          let message2 = `Du skal derfor tage afsted: ${newTime.toString()}`
+          let newTimeFormatted = new Intl.DateTimeFormat('en-GB', { dateStyle: 'full', timeStyle: 'short' }).format(newTime);
+          let tripDate = new Date(trip.departureTime);
+          let departureTimeFormatted = new Intl.DateTimeFormat('en-GB', { dateStyle: 'full', timeStyle: 'short' }).format(tripDate);
+          let message1 = `${trip.startDestination} - ${trip.endDestination} \nDu skulle have været ved dit stop ${departureTimeFormatted} \nEt stop på din rejse er forsinket, så afgangstidspunktet udskydes`;
+          let message2 = `Du skal derfor tage afsted: ${newTimeFormatted.toString()}`
           alert(message1 + "\n" + message2);
         }
       },
